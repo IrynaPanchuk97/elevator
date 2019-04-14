@@ -5,13 +5,12 @@ using System.Text;
 using System.Drawing;
 using System.Threading;
 using System.Timers;
-
+using LiftSimulator.Custom_classes;
 
 namespace LiftSimulator
 {
-    public class Elevator
-    {
-
+     public class Elevator:Colleague
+     {
         #region FIELDS
 
         private readonly object locker = new object();
@@ -38,7 +37,8 @@ namespace LiftSimulator
 
         #region METHODS
 
-        public Elevator(Building Mybuilding, int HorizontalPosition, Floor StartingFloor)
+        public Elevator(Building Mybuilding, int HorizontalPosition, Floor StartingFloor, Mediator mediator)
+            : base(mediator)
         {
             this.myBuilding = Mybuilding;
 

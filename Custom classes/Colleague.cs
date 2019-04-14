@@ -5,7 +5,7 @@ using System.Text;
 
 namespace LiftSimulator.Custom_classes
 {
-    abstract class Colleague
+    public abstract class Colleague
     {
         protected Mediator mediator;
         public Colleague (Mediator mediator)

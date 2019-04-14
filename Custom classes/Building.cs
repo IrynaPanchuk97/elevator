@@ -1,4 +1,5 @@
-﻿using System;
+﻿using LiftSimulator.Custom_classes;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -42,9 +43,9 @@ namespace LiftSimulator
             _arrayFloors[3] = new Floor(this, 3, 32);
 
             _arrayElevators = new Elevator[3];
-            _arrayElevators[0] = new Elevator(this, 124, _arrayFloors[0]);
-            _arrayElevators[1] = new Elevator(this, 210, _arrayFloors[0]);
-            _arrayElevators[2] = new Elevator(this, 295, _arrayFloors[0]);
+            _arrayElevators[0] = new Elevator(this, 124, _arrayFloors[0], ElevatorManager );
+            _arrayElevators[1] = new Elevator(this, 210, _arrayFloors[0], ElevatorManager);
+            _arrayElevators[2] = new Elevator(this, 295, _arrayFloors[0], ElevatorManager);
 
             ListOfAllPeopleWhoNeedAnimation = new List<Passenger>();
             ElevatorManager = new ElevatorManager(ArrayOfAllElevators, arrayFloors);
