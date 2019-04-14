@@ -15,14 +15,13 @@ namespace LiftSimulator
 
         static Bitmap[] ArrayOfAllPassengerGraphics = 
         {
-            new Bitmap(Properties.Resources.TrollMan),
-            new Bitmap(Properties.Resources.NoMan),
-            new Bitmap(Properties.Resources.SheSmartass),
-            new Bitmap(Properties.Resources.Smile),
-            new Bitmap(Properties.Resources.Geek),
-            new Bitmap(Properties.Resources.SheMad),
-            new Bitmap(Properties.Resources.ForeverAlone),
-            new Bitmap(Properties.Resources.SheSmile)
+            new Bitmap(Properties.Resources.One),
+            new Bitmap(Properties.Resources.Two),
+            new Bitmap(Properties.Resources.Three),
+            new Bitmap(Properties.Resources.Four),
+            new Bitmap(Properties.Resources.Five),
+            new Bitmap(Properties.Resources.Six),
+            new Bitmap(Properties.Resources.Seven),
         };
         
         private Building myBuilding;
