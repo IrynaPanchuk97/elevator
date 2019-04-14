@@ -54,7 +54,7 @@ namespace LiftSimulator
             this.currentFloorIndex = CurrentFloor.FloorIndex;            
             this.passengerStatus = PassengerStatus.WaitingForAnElevator;
 
-            this.targetFloor = MyBuilding.ArrayOfAllFloors[TargetFloorIndex];
+            this.targetFloor = MyBuilding.arrayFloors[TargetFloorIndex];
             this.targetFloorIndex = TargetFloorIndex;
 
             this.PassengerPosition = new Point();

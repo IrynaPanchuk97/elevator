@@ -29,7 +29,7 @@ namespace LiftSimulator
 
         public Floor MyFloor
         {
-            get { return (MyForm.MyBuilding.ArrayOfAllFloors[this.floorIndex]); }
+            get { return (MyForm.MyBuilding.arrayFloors[this.floorIndex]); }
             private set { }
         }
 
@@ -63,7 +63,7 @@ namespace LiftSimulator
 
                 //Where the passenger is going to?
                 FloorSelectionDialog dialog = new FloorSelectionDialog(); //create new dialog
-                for (int i = 0; i < MyForm.MyBuilding.ArrayOfAllFloors.Length; i++) //populate combo box with list of available floors
+                for (int i = 0; i < MyForm.MyBuilding.arrayFloors.Length; i++) //populate combo box with list of available floors
                 {
                     if (i != FloorIndex) //skip current floor
                     {
