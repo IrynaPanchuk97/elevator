@@ -91,18 +91,18 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
       <SubType>Designer</SubType>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <Compile Include="Properties\Resources.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Resources.resx</DependentUpon>
-      <DesignTime>True</DesignTime>
-    </Compile>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
     <Compile Include="Properties\Settings.Designer.cs">
       <AutoGen>True</AutoGen>
       <DependentUpon>Settings.settings</DependentUpon>
@@ -137,43 +137,14 @@
     <None Include="Resources\LiftDoors_Open.jpg" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\PassengerBody.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\TrollFace.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\TrollMan.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\TrollManFat.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\TrollManFatAlfa.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\TrollManFatAlfaGIF.gif" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\NoMan.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\SheSmartass.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Smile.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Geek.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\SheMad.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\ForeverAlone.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\SheSmile.png" />
+    <Content Include="Resources\Bitmap1.bmp" />
+    <Content Include="Resources\Five.png" />
+    <Content Include="Resources\Four.png" />
+    <Content Include="Resources\One.png" />
+    <Content Include="Resources\Seven.png" />
+    <Content Include="Resources\Six.png" />
+    <Content Include="Resources\Three.png" />
+    <Content Include="Resources\Two.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
