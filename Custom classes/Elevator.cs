@@ -62,7 +62,7 @@ namespace LiftSimulator
                 Properties.Resources.LiftDoors_1, 
                 Properties.Resources.LiftDoors_Closed
             };
-            this.elevatorAnimationDelay = 8;
+            this.elevatorAnimationDelay = 2;
             this.elevatorTimer = new System.Timers.Timer(6000); //set timer to 6 seconds
             this.elevatorTimer.Elapsed += new ElapsedEventHandler(this.Elevator_ElevatorTimerElapsed);
 
