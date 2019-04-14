@@ -7,8 +7,8 @@ namespace LiftSimulator
 {
     public enum Direction
     {
-        Up,
-        Down,
-        None, //e.g. for idling elevators
+        up,
+        down,
+        stop, 
     } 
 }

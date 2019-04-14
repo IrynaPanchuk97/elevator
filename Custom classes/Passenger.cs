@@ -143,11 +143,11 @@ namespace LiftSimulator
         {
             if (currentFloorIndex < targetFloorIndex)
             {
-                this.PassengerDirection = Direction.Up;
+                this.PassengerDirection = Direction.up;
             }
             else
             {
-                this.PassengerDirection = Direction.Down;
+                this.PassengerDirection = Direction.down;
             }
         }
 
@@ -158,7 +158,7 @@ namespace LiftSimulator
             {
                 return true; //Elevator direction is OK
             }
-            else if (ElevatorOnMyFloor.GetElevatorDirection() == Direction.None)
+            else if (ElevatorOnMyFloor.GetElevatorDirection() == Direction.stop)
             {
                 return true; //If an elevator has no floors to visit, then it is always the right elevator
             }

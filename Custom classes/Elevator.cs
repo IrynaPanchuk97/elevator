@@ -44,7 +44,7 @@ namespace LiftSimulator
 
             this.currentFloor = StartingFloor;
             this.listOfFloorsToVisit = new List<Floor>();
-            this.elevatorDirection = Direction.None;
+            this.elevatorDirection = Direction.stop;
             this.elevatorStatus = ElevatorStatus.Idle;
 
             this.maximumPeopleInside = 2;
@@ -95,12 +95,12 @@ namespace LiftSimulator
         private void GoToNextFloorOnTheList()
         {
             //Move control on the UI                 
-            if (elevatorDirection == Direction.Down) //move down
+            if (elevatorDirection == Direction.down) //move down
             {
                 this.SetElevatorStatus(ElevatorStatus.GoingDown);
                 this.MoveTheElevatorGraphicDown(GetNextFloorToVisit().GetFloorLevelInPixels());
             }
-            else if (elevatorDirection == Direction.Up) //move up
+            else if (elevatorDirection == Direction.up) //move up
             {
                 this.SetElevatorStatus(ElevatorStatus.GoingUp);
                 this.MoveTheElevatorGraphicUp(GetNextFloorToVisit().GetFloorLevelInPixels());
@@ -117,7 +117,7 @@ namespace LiftSimulator
 
             //If one of passengers inside wants to get out here or this is end of the road,
             //then finalize going to next floor on the list
-            if (SomePassengersWantsToGetOutOnThisFloor() || (this.elevatorDirection == Direction.None))
+            if (SomePassengersWantsToGetOutOnThisFloor() || (this.elevatorDirection == Direction.stop))
             {
                 FinalizeGoingToNextFloorOnTheList();
                 return;
@@ -126,8 +126,8 @@ namespace LiftSimulator
             //If elevator is not full, then check lamps on the floor
             if (!this.IsFull)
             {
-                if (((this.elevatorDirection == Direction.Up) && (currentFloor.LampUp)) ||
-                ((this.elevatorDirection == Direction.Down) && (currentFloor.LampDown)))
+                if (((this.elevatorDirection == Direction.up) && (currentFloor.LampUp)) ||
+                ((this.elevatorDirection == Direction.down) && (currentFloor.LampDown)))
                 {
                     FinalizeGoingToNextFloorOnTheList();
                     return;
@@ -143,13 +143,13 @@ namespace LiftSimulator
             //Reset appropriate lamp on current floor
             switch (this.elevatorDirection)
             {
-                case Direction.Up:
+                case Direction.up:
                     currentFloor.LampUp = false;
                     break;
-                case Direction.Down:
+                case Direction.down:
                     currentFloor.LampDown = false;
                     break;
-                case Direction.None:
+                case Direction.stop:
                     currentFloor.LampUp = false;
                     currentFloor.LampDown = false;
                     break;
@@ -266,17 +266,17 @@ namespace LiftSimulator
             //AddNewFloorToTheList method is the only reference for this method and it has its own lock         
             if (GetNextFloorToVisit() == null)
             {
-                this.elevatorDirection = Direction.None;
+                this.elevatorDirection = Direction.stop;
                 return;
             }
 
             if (currentFloor.FloorIndex < GetNextFloorToVisit().FloorIndex)
             {
-                this.elevatorDirection = Direction.Up;
+                this.elevatorDirection = Direction.up;
             }
             else
             {
-                this.elevatorDirection = Direction.Down;
+                this.elevatorDirection = Direction.down;
             }            
         }
 
