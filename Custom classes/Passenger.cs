@@ -47,18 +47,16 @@ namespace LiftSimulator
             this.currentFloor = CurrentFloor.FloorIndex;            
             this.status = PassengerStatus.WaitingForAnElevator;
 
-            this.targetFloor = MyBuilding.arrayFloors[TargetFloorIndex];
+            this.targetFloor = MyBuilding.arrayFloor[TargetFloorIndex];
             this.targetFloorIndex = TargetFloorIndex;
 
             this.PassengerPosition = new Point();
 
             Random random = new Random();
-            this.thisPassengerGraphic = new Bitmap(Passenger.ArrayOfAllPassengerGraphics[random.Next(ArrayOfAllPassengerGraphics.Length)]);
+            this.thisPassengerGraphic = new Bitmap(Passenger.PeopleListImage[random.Next(PeopleListImage.Length)]);
 
             this.visible = true;
-            this.passengerAnimationDelay = 8;
-
-            //Subscribe to events
+            this.passengerAnimationDelay = 3;
             this._currentFloor.NewPassengerAppeared += new EventHandler(_currentFloor.Floor_NewPassengerAppeared);
             this._currentFloor.NewPassengerAppeared += new EventHandler(this.Passenger_NewPassengerAppeared);
             this._currentFloor.ElevatorHasArrivedOrIsNotFullAnymore += new EventHandler(this.Passenger_ElevatorHasArrivedOrIsNoteFullAnymore); 
@@ -66,132 +64,79 @@ namespace LiftSimulator
 
         private void FindAnElevatorOrCallForANewOne()
         {            
-            UpdatePassengerDirection();
-
-            //Copy the list of elevators available now on current floor
-            List<Elevator> ListOfElevatorsWaitingOnMyFloor = _currentFloor.GetListOfElevatorsWaitingHere();
-
-            //Search the right elevator on my floor
-            foreach (Elevator elevator in ListOfElevatorsWaitingOnMyFloor)
-            {
+            UpdateElevator();
+            List<Elevator> listElevatorOnFloor = _currentFloor.WaitElevator();
+            foreach (Elevator elevator in listElevatorOnFloor) {
                 if (ElevatorsDirectionIsNoneOrOk(elevator))
                 {
                     if (elevator.AddNewPassengerIfPossible(this, this.targetFloor))
                     {
-                        //Update insideTheElevator
                         this.status = PassengerStatus.GettingInToTheElevator;
-
                         ThreadPool.QueueUserWorkItem(delegate { GetInToTheElevator(elevator); });                        
                         return;
                     }
                 }
             }
 
-            //Call for an elevator
             _building.ElevatorManager.PassengerNeedsAnElevator(_currentFloor, this.direct);            
         }
 
         private void GetInToTheElevator(Elevator ElevatorToGetIn)
         {
-            //Rise an event
             ElevatorToGetIn.OnPassengerEnteredTheElevator(new PassengerEventArgs(this));
-
-            //Unsubscribe from an event for current floor
             this._currentFloor.ElevatorHasArrivedOrIsNotFullAnymore -= this.Passenger_ElevatorHasArrivedOrIsNoteFullAnymore;
-            
-            //Move the picture on the UI
             this.MovePassengersGraphicHorizontally(ElevatorToGetIn.GetElevatorXPosition());
-            
-            //Make PassengerControl invisible
             this.visible = false;
-            
-            //Update myElevator
             this.myElevator = ElevatorToGetIn;
         }
 
         public void ElevatorReachedNextFloor()
         {
-            //For passengers, who are already inside an elevator:
             if (this.myElevator.GetCurrentFloor() == this.targetFloor)
             {
-                //Set appropriate flag
                 this.status = PassengerStatus.LeavingTheBuilding;                
-
-                //Get out of the elevator
                 ThreadPool.QueueUserWorkItem(delegate { GetOutOfTheElevator(this.myElevator); });
             }
         }
 
         private void GetOutOfTheElevator(Elevator ElevatorWhichArrived)
         {
-            //Remove passenger from elevator
             ElevatorWhichArrived.RemovePassenger(this);
-
-            //Leave the building
             this.LeaveTheBuilding();
         }
 
-        private void UpdatePassengerDirection()
+        private void UpdateElevator()
         {
-            if (currentFloor < targetFloorIndex)
-            {
-                this.direct = Direction.up;
-            }
-            else
-            {
-                this.direct = Direction.down;
-            }
+            if (currentFloor < targetFloorIndex) this.direct = Direction.up;
+            else  this.direct = Direction.down;
         }
 
         private bool ElevatorsDirectionIsNoneOrOk(Elevator ElevatorOnMyFloor)
         {
-            //Check if elevator has more floors to visit            
-            if (ElevatorOnMyFloor.GetElevatorDirection() == this.direct)
-            {
-                return true; //Elevator direction is OK
-            }
-            else if (ElevatorOnMyFloor.GetElevatorDirection() == Direction.stop)
-            {
-                return true; //If an elevator has no floors to visit, then it is always the right elevator
-            }
-
-            return false; //Elevator direction is NOT OK
+            if (ElevatorOnMyFloor.GetElevatorDirection() == this.direct) return true;
+            else if (ElevatorOnMyFloor.GetElevatorDirection() == Direction.stop) return true;
+            return false;
         }
 
         private void LeaveTheBuilding()
         {
-            //Update starting position
-            this.PassengerPosition = new Point(PassengerPosition.X, myElevator.GetElevatorYPosition());
-
-            //Flip the control
-            this.FlipPassengerGraphicHorizontally();
-
-            //Make the passenger visible            
+            this.PassengerPosition = new Point(PassengerPosition.X,  myElevator.GetElevatorYPosition());
+            this.FlipPassengerGraphicHorizontally();         
             this.visible = true;
-
-            //Move the passenger up to the exit
             this.MovePassengersGraphicHorizontally(_building.ExitLocation);
-
-            //Make the passenger invisible again 
-            //TO DO: dispose object instead making it invisble
             this.visible = false;
-
-            //No need to animate it
-            _building.ListOfAllPeopleWhoNeedAnimation.Remove(this);
+            _building.listeople.Remove(this);
         }
 
         private void MovePassengersGraphicHorizontally (int DestinationPosition)
         {
-            if (this.PassengerPosition.X > DestinationPosition) //go left
-            {
-                for (int i = this.PassengerPosition.X; i > DestinationPosition; i--)
-                {
+            if (this.PassengerPosition.X > DestinationPosition) {
+                for (int i = this.PassengerPosition.X; i > DestinationPosition; i--){
                     Thread.Sleep(this.passengerAnimationDelay);                    
                     this.PassengerPosition = new Point(i, this.PassengerPosition.Y);                    
                 }
             }
-            else //go right
-            {
+            else {
                 for (int i = this.PassengerPosition.X; i < DestinationPosition; i++)
                 {
                     Thread.Sleep(this.passengerAnimationDelay);
@@ -200,76 +145,33 @@ namespace LiftSimulator
             }
         }
 
-        private void FlipPassengerGraphicHorizontally()
-        {
-            this.thisPassengerGraphic.RotateFlip(RotateFlipType.Rotate180FlipY);
-        }             
+        private void FlipPassengerGraphicHorizontally()=> this.thisPassengerGraphic.RotateFlip(RotateFlipType.Rotate180FlipY);            
+        public Floor GetTargetFloor()=>this.targetFloor;
+        public bool GetPassengerVisibility() => this.visible;
+        public int GetAnimationDelay()=>this.passengerAnimationDelay;
+        public Bitmap GetCurrentFrame()=> this.thisPassengerGraphic;
 
-        public Floor GetTargetFloor()
-        {
-            return this.targetFloor;
-        }
-
-        public bool GetPassengerVisibility()
-        {
-            return this.visible;
-        }
-
-        public int GetAnimationDelay()
-        {
-            return this.passengerAnimationDelay;
-        }
-
-        public Bitmap GetCurrentFrame()
-        {
-            return this.thisPassengerGraphic;
-        }
-
-        
-
-
-        #region EVENT HANDLERS
-
-        public void Passenger_NewPassengerAppeared(object sender, EventArgs e)
-        {
-            //Unsubscribe from this event (not needed anymore)            
+        public void Passenger_NewPassengerAppeared(object sender, EventArgs e){
             this._currentFloor.NewPassengerAppeared -= this.Passenger_NewPassengerAppeared;
-
-            //Search an elevator
             FindAnElevatorOrCallForANewOne();            
         }
 
         public void Passenger_ElevatorHasArrivedOrIsNoteFullAnymore(object sender, EventArgs e)
         {            
-            lock (locker) //Few elevators (on different threads) can rise this event at the same time
-            {
+            lock (locker){
                 Elevator ElevatorWhichRisedAnEvent = ((ElevatorEventArgs)e).ElevatorWhichRisedAnEvent;
-
-                //For passengers who are getting in to the elevator and may not be able to unsubscribe yet                
-                if (this.status == PassengerStatus.GettingInToTheElevator)
-                {
-                    return;
-                }
-
-                //For passengers, who await for an elevator
+                if (this.status == PassengerStatus.GettingInToTheElevator)return;
                 if (this.status == PassengerStatus.WaitingForAnElevator)
                 {
                     if ((ElevatorsDirectionIsNoneOrOk(ElevatorWhichRisedAnEvent) && (ElevatorWhichRisedAnEvent.AddNewPassengerIfPossible(this, targetFloor))))
                     {
-                        //Set passengerStatus
                         status = PassengerStatus.GettingInToTheElevator;
-                        
-                        //Get in to the elevator
                         ThreadPool.QueueUserWorkItem(delegate { GetInToTheElevator(ElevatorWhichRisedAnEvent); });
                     }
-                    else
-                    {
-                        FindAnElevatorOrCallForANewOne();
-                    }
+                    else   FindAnElevatorOrCallForANewOne();
+                    
                 }                 
             }    
         }
-
-        #endregion EVENT HANDLERS
     }
 }

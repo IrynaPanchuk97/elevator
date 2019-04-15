@@ -2,16 +2,9 @@
 {
     partial class Form1
     {
-        /// <summary>
-        /// Required designer variable.
-        /// </summary>
-        private System.ComponentModel.IContainer components = null;
 
-        /// <summary>
-        /// Clean up any resources being used.
-        /// </summary>
-        /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
-        protected override void Dispose(bool disposing)
+        private System.ComponentModel.IContainer components = null;
+         protected override void Dispose(bool disposing)
         {
             if (disposing && (components != null))
             {
@@ -19,13 +12,6 @@
             }
             base.Dispose(disposing);
         }
-
-        #region Windows Form Designer generated code
-
-        /// <summary>
-        /// Required method for Designer support - do not modify
-        /// the contents of this method with the code editor.
-        /// </summary>
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
@@ -35,15 +21,11 @@
             this.newPassengerButton2 = new LiftSimulator.NewPassengerButton();
             this.newPassengerButton3 = new LiftSimulator.NewPassengerButton();
             this.SuspendLayout();
-            // 
-            // timerRefresh
-            // 
+
             this.timerRefresh.Enabled = true;
             this.timerRefresh.Interval = 10;
             this.timerRefresh.Tick += new System.EventHandler(this.timerRefresh_Tick);
-            // 
-            // newPassengerButton0
-            // 
+ 
             this.newPassengerButton0.FloorIndex = 0;
             this.newPassengerButton0.Location = new System.Drawing.Point(752, 389);
             this.newPassengerButton0.Name = "newPassengerButton0";
@@ -51,9 +33,8 @@
             this.newPassengerButton0.TabIndex = 12;
             this.newPassengerButton0.Text = "New passenger";
             this.newPassengerButton0.UseVisualStyleBackColor = true;
-            // 
-            // newPassengerButton1
-            // 
+
+
             this.newPassengerButton1.FloorIndex = 1;
             this.newPassengerButton1.Location = new System.Drawing.Point(752, 279);
             this.newPassengerButton1.Name = "newPassengerButton1";
@@ -61,9 +42,8 @@
             this.newPassengerButton1.TabIndex = 11;
             this.newPassengerButton1.Text = "New passenger";
             this.newPassengerButton1.UseVisualStyleBackColor = true;
-            // 
-            // newPassengerButton2
-            // 
+
+
             this.newPassengerButton2.FloorIndex = 2;
             this.newPassengerButton2.Location = new System.Drawing.Point(752, 169);
             this.newPassengerButton2.Name = "newPassengerButton2";
@@ -71,9 +51,8 @@
             this.newPassengerButton2.TabIndex = 10;
             this.newPassengerButton2.Text = "New passenger";
             this.newPassengerButton2.UseVisualStyleBackColor = true;
-            // 
-            // newPassengerButton3
-            // 
+       
+
             this.newPassengerButton3.FloorIndex = 3;
             this.newPassengerButton3.Location = new System.Drawing.Point(752, 59);
             this.newPassengerButton3.Name = "newPassengerButton3";
@@ -81,9 +60,9 @@
             this.newPassengerButton3.TabIndex = 9;
             this.newPassengerButton3.Text = "New passenger";
             this.newPassengerButton3.UseVisualStyleBackColor = true;
-            // 
-            // Form1
-            // 
+    
+
+
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(834, 496);
@@ -100,7 +79,6 @@
 
         }
 
-        #endregion
 
         private NewPassengerButton newPassengerButton3;
         private NewPassengerButton newPassengerButton2;

@@ -8,10 +8,6 @@ namespace LiftSimulator.Custom_classes
     public abstract class Colleague
     {
         protected Mediator mediator;
-        public Colleague (Mediator mediator)
-        {
-            this.mediator = mediator;
-        }
-
+        public Colleague (Mediator mediator)=> this.mediator = mediator;
     }
 }

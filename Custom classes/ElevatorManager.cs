@@ -1,5 +1,4 @@
 ﻿using LiftSimulator.Algorithm;
-using LiftSimulator.Custom_classes;
 using LiftSimulator.Interface;
 using System;
 using System.Collections.Generic;
@@ -10,7 +9,7 @@ using System.Timers;
 
 namespace LiftSimulator
 {
-    public class ElevatorManager:Mediator
+    public class ElevatorManager
     {
         private readonly object locker = new object();
         private Elevator[] _arrayElevator;

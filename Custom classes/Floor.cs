@@ -9,7 +9,6 @@ namespace LiftSimulator
 {
     public class Floor
     {
-        #region FIELDS
 
         private readonly object locker = new object();
 
@@ -21,26 +20,21 @@ namespace LiftSimulator
 
         private List<Elevator> listOfElevatorsWaitingHere;
 
-        private int floorIndex; //possible values for current graphic: 0, 1, 2, 3
+        private int floorIndex;
         public int FloorIndex
         {
             get { return floorIndex; }
             private set { }
         }
 
-        private int floorLevel; //determines (in pixels) where passengers should stand; depends on building graphic
+        private int floorLevel; 
+        private int beginOfTheQueue; 
+        private int widthOfSlotForSinglePassenger; 
 
-        private int beginOfTheQueue; //determines, where queue of paasengers begins; depends on building graphic
-
-        private int widthOfSlotForSinglePassenger; //ammount of pixels reserved for single passenger; depends on passenger graphic        
-
-        public bool LampUp; //indicates, that at least one of passengers wants to up
-        public bool LampDown; //indicates, that at least one of passengers wants to down
-
-        #endregion
+        public bool LampUp;
+        public bool LampDown; 
 
 
-        #region METHODS
 
         public Floor(Building myBuilding, int floorNumber, int floorLevel)
         {
@@ -64,7 +58,6 @@ namespace LiftSimulator
 
         private int? FindFirstFreeSlotInQueue()
         {
-            //Lock not needed. Only one reference, already locked.
             for (int i = 0; i < maximumAmmountOfPeopleInTheQueue; i++)
             {
                 if (arrayOfPeopleWaitingForElevator[i] == null)
@@ -78,24 +71,20 @@ namespace LiftSimulator
 
         private void AddRemoveNewPassengerToTheQueue(Passenger PassengerToAddOrRemvove, bool AddFlag)
         {
-            //Lock not needed. Only two references (from this), both already locked                        
             if (AddFlag) //Add passenger
             {
-                int? FirstFreeSlotInQueue = FindFirstFreeSlotInQueue(); //Make sure there is a space to add new passenger
+                int? FirstFreeSlotInQueue = FindFirstFreeSlotInQueue();
                 if (FirstFreeSlotInQueue != null)
                 {
-                    //Add passenger object to an array                    
                     this.arrayOfPeopleWaitingForElevator[(int)FirstFreeSlotInQueue] = PassengerToAddOrRemvove;
 
-                    //Add passenger control to the UI
                     int NewPassengerVerticalPosition = this.beginOfTheQueue + (this.widthOfSlotForSinglePassenger * (int)FirstFreeSlotInQueue);
                     PassengerToAddOrRemvove.PassengerPosition = new Point(NewPassengerVerticalPosition, GetFloorLevelInPixels());
 
-                    //Add passenger to Building's list
-                    myBuilding.ListOfAllPeopleWhoNeedAnimation.Add(PassengerToAddOrRemvove);
+                    myBuilding.listeople.Add(PassengerToAddOrRemvove);
                 }
             }
-            else //Remove passenger
+            else 
             {
                 int PassengerToRemoveIndex = Array.IndexOf<Passenger>(GetArrayOfPeopleWaitingForElevator(), PassengerToAddOrRemvove);
                 this.GetArrayOfPeopleWaitingForElevator()[PassengerToRemoveIndex] = null;
@@ -104,22 +93,17 @@ namespace LiftSimulator
 
         public void AddRemoveElevatorToTheListOfElevatorsWaitingHere(Elevator ElevatorToAddOrRemove, bool AddFlag)
         {
-            lock (locker) //Few elevators can try to add/remove themselfs at the same time
+            lock (locker) 
             {
-                if (AddFlag) //Add elevator
+                if (AddFlag) 
                 {
-                    //Add elevator to the list
                     listOfElevatorsWaitingHere.Add(ElevatorToAddOrRemove);
 
-                    //Subscribe to an event, rised when passenger entered the elevator
                     ElevatorToAddOrRemove.PassengerEnteredTheElevator += new EventHandler(this.Floor_PassengerEnteredTheElevator);
                 }
-                else //Remove elevator
+                else
                 {
-                    //Remove elevator from the list
                     listOfElevatorsWaitingHere.Remove(ElevatorToAddOrRemove);
-
-                    //Unsubscribe from an event, rised when passenger entered the elevator
                     ElevatorToAddOrRemove.PassengerEnteredTheElevator -= this.Floor_PassengerEnteredTheElevator;
                 }
             }
@@ -132,7 +116,7 @@ namespace LiftSimulator
 
         public int GetCurrentAmmountOfPeopleInTheQueue()
         {
-            lock (locker) //The same lock is on add/remove passenger to the queue
+            lock (locker) 
             {
                 int CurrentAmmountOfPeopleInTheQueue = 0;
                 for (int i = 0; i < maximumAmmountOfPeopleInTheQueue; i++)
@@ -151,9 +135,8 @@ namespace LiftSimulator
             return arrayOfPeopleWaitingForElevator;
         }
 
-        public List<Elevator> GetListOfElevatorsWaitingHere()
+        public List<Elevator> WaitElevator()
         {
-            //Lock not needed. Method for passengers only.
             lock (locker)
             {
                 return this.listOfElevatorsWaitingHere;
@@ -165,41 +148,19 @@ namespace LiftSimulator
             return this.floorLevel;
         }
 
-        #endregion
-
-
-        #region EVENTS
 
         public event EventHandler NewPassengerAppeared;
-        public void OnNewPassengerAppeared(EventArgs e)
-        {
-            EventHandler newPassengerAppeared = NewPassengerAppeared;
-            if (newPassengerAppeared != null)
-            {
-                newPassengerAppeared(this, e);
-            }
-        }
+        public void OnNewPassengerAppeared(EventArgs e)=> NewPassengerAppeared?.Invoke(this, e);
 
         public event EventHandler ElevatorHasArrivedOrIsNotFullAnymore;
         public void OnElevatorHasArrivedOrIsNoteFullAnymore(ElevatorEventArgs e)
         {
-            EventHandler elevatorHasArrivedOrIsNoteFullAnymore = ElevatorHasArrivedOrIsNotFullAnymore;
-            if (elevatorHasArrivedOrIsNoteFullAnymore != null)
-            {
-                elevatorHasArrivedOrIsNoteFullAnymore(this, e);
-            }
+            ElevatorHasArrivedOrIsNotFullAnymore?.Invoke(this, e);
         }
-
-        #endregion
-
-
-        #region EVENT HADNLERS
-
         public void Floor_NewPassengerAppeared(object sender, EventArgs e)
         {
             lock (locker)
             {
-                //Unsubscribe from this event (not needed anymore)
                 this.NewPassengerAppeared -= this.Floor_NewPassengerAppeared;
 
                 Passenger NewPassenger = ((PassengerEventArgs)e).PassengerWhoRisedAnEvent;
@@ -213,12 +174,9 @@ namespace LiftSimulator
             lock (locker)
             {
                 Passenger PassengerWhoEnteredOrLeftTheElevator = ((PassengerEventArgs)e).PassengerWhoRisedAnEvent;
-
-                //Remove passenger from queue                
                 AddRemoveNewPassengerToTheQueue(PassengerWhoEnteredOrLeftTheElevator, false);
             }
         }
 
-        #endregion
     }
 }

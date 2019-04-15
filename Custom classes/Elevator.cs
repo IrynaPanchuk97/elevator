@@ -5,20 +5,19 @@ using System.Text;
 using System.Drawing;
 using System.Threading;
 using System.Timers;
-using LiftSimulator.Custom_classes;
 
 namespace LiftSimulator
 {
-     public class Elevator:Colleague
+     public class Elevator
      {
         #region FIELDS
 
         private readonly object locker = new object();
 
-        private Building myBuilding;
+        private readonly Building myBuilding;
 
         private Floor currentFloor;
-        private List<Floor> listOfFloorsToVisit;
+        private readonly List<Floor> listOfFloorsToVisit;
         private Direction elevatorDirection;
         private ElevatorStatus elevatorStatus;
 
@@ -32,13 +31,8 @@ namespace LiftSimulator
         private int elevatorAnimationDelay;
         private System.Timers.Timer elevatorTimer;
 
-        #endregion
 
-
-        #region METHODS
-
-        public Elevator(Building Mybuilding, int HorizontalPosition, Floor StartingFloor, Mediator mediator)
-            : base(mediator)
+        public Elevator(Building Mybuilding, int HorizontalPosition, Floor StartingFloor)
         {
             this.myBuilding = Mybuilding;
 
@@ -196,9 +190,9 @@ namespace LiftSimulator
                 {
                     for (int i = this.currentFloor.FloorIndex + 1; i <= FloorToBeAdded.FloorIndex; i++)
                     {
-                        if (!GetListOfAllFloorsToVisit().Contains(myBuilding.arrayFloors[i]))
+                        if (!GetListOfAllFloorsToVisit().Contains(myBuilding.arrayFloor[i]))
                         {
-                            GetListOfAllFloorsToVisit().Add(myBuilding.arrayFloors[i]);
+                            GetListOfAllFloorsToVisit().Add(myBuilding.arrayFloor[i]);
                         }
                     }
                 }
@@ -208,9 +202,9 @@ namespace LiftSimulator
                 {
                     for (int i = this.currentFloor.FloorIndex - 1; i >= FloorToBeAdded.FloorIndex; i--)
                     {
-                        if (!GetListOfAllFloorsToVisit().Contains(myBuilding.arrayFloors[i]))
+                        if (!GetListOfAllFloorsToVisit().Contains(myBuilding.arrayFloor[i]))
                         {
-                            this.GetListOfAllFloorsToVisit().Add(myBuilding.arrayFloors[i]);
+                            this.GetListOfAllFloorsToVisit().Add(myBuilding.arrayFloor[i]);
                         }
                     }
                 }
@@ -447,22 +441,12 @@ namespace LiftSimulator
         public event EventHandler PassengerEnteredTheElevator;
         public void OnPassengerEnteredTheElevator(PassengerEventArgs e)
         {
-            EventHandler passengerEnteredTheElevator = PassengerEnteredTheElevator;
-            if (passengerEnteredTheElevator != null)
-            {
-                passengerEnteredTheElevator(this, e);
-            }
+            PassengerEnteredTheElevator?.Invoke(this, e);
         }
 
         public event EventHandler ElevatorIsFull;
-        public void OnElevatorIsFullAndHasToGoDown(EventArgs e)
-        {
-            EventHandler elevatorIsFull = ElevatorIsFull;
-            if (elevatorIsFull != null)
-            {
-                elevatorIsFull(this, e);
-            }
-        }
+        public void OnElevatorIsFullAndHasToGoDown(EventArgs e)=> ElevatorIsFull?.Invoke(this, e);
+ 
 
         #endregion
 

@@ -11,87 +11,52 @@ namespace LiftSimulator
 {
     public partial class NewPassengerButton : Button
     {
-        #region FIELDS
 
-        private int floorIndex; //index of floor which button is assigned to
+        private int floorIndex;
         [Description("Floor which button is assigned to.")]
         public int FloorIndex
         {
             get { return floorIndex; }
             set { floorIndex = value; }
         }
-                
-        public Form1 MyForm 
-        { 
+
+        public Form1 MyForm
+        {
             get { return (Form1)this.FindForm(); }
-            private set {} 
+            private set { }
         }
 
         public Floor MyFloor
         {
-            get { return (MyForm.MyBuilding.arrayFloors[this.floorIndex]); }
+            get { return (MyForm.MyBuilding.arrayFloor[this.floorIndex]); }
             private set { }
         }
 
-        #endregion FIELDS
-
-
-        #region METHODS
-
-        public NewPassengerButton()
-        {
-            InitializeComponent();                        
-        }               
-
-        #endregion METHODS
-
-
-        #region EVENT HANDLERS
-        
+        public NewPassengerButton() => InitializeComponent();
         private void NewPassengerButton_Click(object sender, EventArgs e)
         {
-            if (sender is NewPassengerButton) //upcast sender to NewPassengerButton
+            if (sender is NewPassengerButton)
             {
                 NewPassengerButton ThisPassengerButton = (NewPassengerButton)sender;
 
-                //Check if there is enough space to add another passenger to the floor
-                if (MyFloor.GetCurrentAmmountOfPeopleInTheQueue() >= MyFloor.GetMaximumAmmountOfPeopleInTheQueue()) 
+                if (MyFloor.GetCurrentAmmountOfPeopleInTheQueue() >= MyFloor.GetMaximumAmmountOfPeopleInTheQueue())
                 {
-                    MessageBox.Show("It looks like the corridor is too crowdy now. Please, wait a while until elevators take few passengers away.", "Your passenger has to wait");
+                    MessageBox.Show("Too many people on the floor");
                     return;
                 }
+                FloorSelectionDialog dialog = new FloorSelectionDialog();
+                for (int i = 0; i < MyForm.MyBuilding.arrayFloor.Length; i++) if (i != FloorIndex) dialog.ListOfFloorsInComboBox.Add(i);
+                if (FloorIndex == 0) dialog.SelectedFloorIndex = 1;
+                else dialog.SelectedFloorIndex = 0;
 
-                //Where the passenger is going to?
-                FloorSelectionDialog dialog = new FloorSelectionDialog(); //create new dialog
-                for (int i = 0; i < MyForm.MyBuilding.arrayFloors.Length; i++) //populate combo box with list of available floors
-                {
-                    if (i != FloorIndex) //skip current floor
-                    {
-                        dialog.ListOfFloorsInComboBox.Add(i);
-                    }                    
-                }
 
-                //Select "0" floor by default (or "1", if floorIndex is "0")
-                if (FloorIndex == 0)
-                {
-                    dialog.SelectedFloorIndex = 1;
-                }
-                else
-                {
-                    dialog.SelectedFloorIndex = 0;
-                }   
-                                
-                DialogResult result = dialog.ShowDialog(); //check dialog result
+                DialogResult result = dialog.ShowDialog();
                 if (result == DialogResult.OK)
                 {
-                    //Create new Passenger object                    
                     Passenger NewPassenger = new Passenger(MyForm.MyBuilding, this.MyFloor, dialog.SelectedFloorIndex);
-                    //Rise an event
                     this.MyFloor.OnNewPassengerAppeared(new PassengerEventArgs(NewPassenger));
-                }                
+                }
             }
         }
-
-        #endregion EVENT HANDLERS
     }
 }

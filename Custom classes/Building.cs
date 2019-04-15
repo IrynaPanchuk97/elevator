@@ -1,5 +1,4 @@
-﻿using LiftSimulator.Custom_classes;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,26 +8,23 @@ namespace LiftSimulator
 {
     public class Building
     {
-        private Floor[] _arrayFloors;
-        private Elevator[] _arrayElevators;
+        private readonly Floor[]  _arrayFloors;
+        private readonly Elevator[] _arrayElevators;
         public ElevatorManager ElevatorManager;
-        public List<Passenger> ListOfAllPeopleWhoNeedAnimation;
-        public Floor[] arrayFloors
+        public List<Passenger> listeople;
+        private readonly int exitLocation;
+        public Floor[] arrayFloor
         {
-            get { return _arrayFloors; }
+            get=> _arrayFloors; 
             private set { }
         }
 
-        public Elevator[] ArrayOfAllElevators
-        {
-            get { return _arrayElevators; }
+        public Elevator[] arrayElevator{
+            get => _arrayElevators; 
             private set { }
         }
-
-        private int exitLocation;
-        public int ExitLocation
-        {
-            get { return exitLocation; }
+        public int ExitLocation{
+            get => exitLocation; 
             private set { }
         }
 
@@ -42,13 +38,15 @@ namespace LiftSimulator
             _arrayFloors[2] = new Floor(this, 2, 144);
             _arrayFloors[3] = new Floor(this, 3, 32);
 
-            _arrayElevators = new Elevator[3];
-            _arrayElevators[0] = new Elevator(this, 124, _arrayFloors[0], ElevatorManager );
-            _arrayElevators[1] = new Elevator(this, 210, _arrayFloors[0], ElevatorManager);
-            _arrayElevators[2] = new Elevator(this, 295, _arrayFloors[0], ElevatorManager);
+            _arrayElevators = new Elevator[4];
+            _arrayElevators[0] = new Elevator(this, 124, _arrayFloors[0]);
+            _arrayElevators[1] = new Elevator(this, 210, _arrayFloors[0]);
+            _arrayElevators[2] = new Elevator(this, 295, _arrayFloors[0]);
+            _arrayElevators[3] = new Elevator(this, 395, _arrayFloors[0]);
 
-            ListOfAllPeopleWhoNeedAnimation = new List<Passenger>();
-            ElevatorManager = new ElevatorManager(ArrayOfAllElevators, arrayFloors);
+
+            listeople = new List<Passenger>();
+            ElevatorManager = new ElevatorManager(arrayElevator, arrayFloor);
         }
 
     }

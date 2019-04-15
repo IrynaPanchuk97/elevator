@@ -12,10 +12,8 @@ namespace LiftSimulator
 {
     public partial class FloorSelectionDialog : Form
     {
-        #region PROPERTIES FOR DIALOG CONTROLS
 
-        public ComboBox.ObjectCollection ListOfFloorsInComboBox
-        {
+        public ComboBox.ObjectCollection ListOfFloorsInComboBox{
             get
             {
                 return this.floorsComboBox.Items;
@@ -44,22 +42,8 @@ namespace LiftSimulator
             }
         }
 
-        #endregion PROPERTIES FOR DIALOG CONTROLS
-
-
-        public FloorSelectionDialog()
-        {
-            InitializeComponent();
-        }
-
-
-        #region EVENT HANDLER
-
-        private void floorsComboBox_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            buttonOK.Select();
-        }
-
-        #endregion
+        public FloorSelectionDialog()=>   InitializeComponent();
+        private void floorsComboBox_SelectedIndexChanged(object sender, EventArgs e)=> buttonOK.Select();
+        private void ButtonOK_Click(object sender, EventArgs e) { }
     }
 }
