@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Drawing;
-using System.Windows.Forms;
 
 namespace LiftSimulator
 {
@@ -11,28 +8,23 @@ namespace LiftSimulator
     {
         #region FIELDS
 
-        private readonly object locker = new object();
+        private readonly object _locker = new object();
 
-        private Building myBuilding;
+        private readonly Building _myBuilding;
 
-        private int maximumAmmountOfPeopleInTheQueue; // depends on graphic
+        private readonly int _maximumAmmountOfPeopleInTheQueue; // depends on graphic
 
-        private Passenger[] arrayOfPeopleWaitingForElevator;
+        private readonly Passenger[] _arrayOfPeopleWaitingForElevator;
 
-        private List<Elevator> listOfElevatorsWaitingHere;
+        private readonly List<Elevator> _listOfElevatorsWaitingHere;
 
-        private int floorIndex; //possible values for current graphic: 0, 1, 2, 3
-        public int FloorIndex
-        {
-            get { return floorIndex; }
-            private set { }
-        }
+        public int FloorIndex { get; }
 
-        private int floorLevel; //determines (in pixels) where passengers should stand; depends on building graphic
+        private readonly int _floorLevel; //determines (in pixels) where passengers should stand; depends on building graphic
 
-        private int beginOfTheQueue; //determines, where queue of paasengers begins; depends on building graphic
+        private readonly int _beginOfTheQueue; //determines, where queue of paasengers begins; depends on building graphic
 
-        private int widthOfSlotForSinglePassenger; //ammount of pixels reserved for single passenger; depends on passenger graphic        
+        private readonly int _widthOfSlotForSinglePassenger; //ammount of pixels reserved for single passenger; depends on passenger graphic        
 
         public bool LampUp; //indicates, that at least one of passengers wants to up
         public bool LampDown; //indicates, that at least one of passengers wants to down
@@ -44,18 +36,18 @@ namespace LiftSimulator
 
         public Floor(Building myBuilding, int floorNumber, int floorLevel)
         {
-            this.myBuilding = myBuilding;
+            this._myBuilding = myBuilding;
 
-            maximumAmmountOfPeopleInTheQueue = 8; //only 8 passengers at once can be visible in current layout
-            this.arrayOfPeopleWaitingForElevator = new Passenger[maximumAmmountOfPeopleInTheQueue];
-            this.floorIndex = floorNumber;
+            _maximumAmmountOfPeopleInTheQueue = 8; //only 8 passengers at once can be visible in current layout
+            this._arrayOfPeopleWaitingForElevator = new Passenger[_maximumAmmountOfPeopleInTheQueue];
+            this.FloorIndex = floorNumber;
 
-            listOfElevatorsWaitingHere = new List<Elevator>();
+            _listOfElevatorsWaitingHere = new List<Elevator>();
 
             //Initialize variables, which depend on graphics:
-            this.floorLevel = floorLevel;
-            beginOfTheQueue = 367;
-            widthOfSlotForSinglePassenger = 46;
+            this._floorLevel = floorLevel;
+            _beginOfTheQueue = 367;
+            _widthOfSlotForSinglePassenger = 46;
 
             //Turn off both lamps
             LampUp = false;
@@ -65,9 +57,9 @@ namespace LiftSimulator
         private int? FindFirstFreeSlotInQueue()
         {
             //Lock not needed. Only one reference, already locked.
-            for (int i = 0; i < maximumAmmountOfPeopleInTheQueue; i++)
+            for (int i = 0; i < _maximumAmmountOfPeopleInTheQueue; i++)
             {
-                if (arrayOfPeopleWaitingForElevator[i] == null)
+                if (_arrayOfPeopleWaitingForElevator[i] == null)
                 {
                     return i;
                 }
@@ -76,40 +68,41 @@ namespace LiftSimulator
             return null;
         }
 
-        private void AddRemoveNewPassengerToTheQueue(Passenger PassengerToAddOrRemvove, bool AddFlag)
+        private void AddRemoveNewPassengerToTheQueue(Passenger passengerToAddOrRemvove, bool addFlag)
         {
             //Lock not needed. Only two references (from this), both already locked                        
-            if (AddFlag) //Add passenger
+            if (addFlag) //Add passenger
             {
-                int? FirstFreeSlotInQueue = FindFirstFreeSlotInQueue(); //Make sure there is a space to add new passenger
-                if (FirstFreeSlotInQueue != null)
+                var firstFreeSlotInQueue = FindFirstFreeSlotInQueue(); //Make sure there is a space to add new passenger
+                if (firstFreeSlotInQueue == null)
                 {
-                    //Add passenger object to an array                    
-                    this.arrayOfPeopleWaitingForElevator[(int)FirstFreeSlotInQueue] = PassengerToAddOrRemvove;
-
-                    //Add passenger control to the UI
-                    int NewPassengerVerticalPosition = this.beginOfTheQueue + (this.widthOfSlotForSinglePassenger * (int)FirstFreeSlotInQueue);
-                    PassengerToAddOrRemvove.PassengerPosition = new Point(NewPassengerVerticalPosition, GetFloorLevelInPixels());
-
-                    //Add passenger to Building's list
-                    myBuilding.ListOfAllPeopleWhoNeedAnimation.Add(PassengerToAddOrRemvove);
+                    return;
                 }
+                //Add passenger object to an array                    
+                this._arrayOfPeopleWaitingForElevator[(int)firstFreeSlotInQueue] = passengerToAddOrRemvove;
+
+                //Add passenger control to the UI
+                int newPassengerVerticalPosition = this._beginOfTheQueue + (this._widthOfSlotForSinglePassenger * (int)firstFreeSlotInQueue);
+                passengerToAddOrRemvove.PassengerPosition = new Point(newPassengerVerticalPosition, GetFloorLevelInPixels());
+
+                //Add passenger to Building's list
+                _myBuilding.ListOfAllPeopleWhoNeedAnimation.Add(passengerToAddOrRemvove);
             }
             else //Remove passenger
             {
-                int PassengerToRemoveIndex = Array.IndexOf<Passenger>(GetArrayOfPeopleWaitingForElevator(), PassengerToAddOrRemvove);
-                this.GetArrayOfPeopleWaitingForElevator()[PassengerToRemoveIndex] = null;
+                int passengerToRemoveIndex = Array.IndexOf(GetArrayOfPeopleWaitingForElevator(), passengerToAddOrRemvove);
+                this.GetArrayOfPeopleWaitingForElevator()[passengerToRemoveIndex] = null;
             }            
         }
 
         public void AddRemoveElevatorToTheListOfElevatorsWaitingHere(Elevator ElevatorToAddOrRemove, bool AddFlag)
         {
-            lock (locker) //Few elevators can try to add/remove themselfs at the same time
+            lock (_locker) //Few elevators can try to add/remove themselfs at the same time
             {
                 if (AddFlag) //Add elevator
                 {
                     //Add elevator to the list
-                    listOfElevatorsWaitingHere.Add(ElevatorToAddOrRemove);
+                    _listOfElevatorsWaitingHere.Add(ElevatorToAddOrRemove);
 
                     //Subscribe to an event, rised when passenger entered the elevator
                     ElevatorToAddOrRemove.PassengerEnteredTheElevator += new EventHandler(this.Floor_PassengerEnteredTheElevator);
@@ -117,7 +110,7 @@ namespace LiftSimulator
                 else //Remove elevator
                 {
                     //Remove elevator from the list
-                    listOfElevatorsWaitingHere.Remove(ElevatorToAddOrRemove);
+                    _listOfElevatorsWaitingHere.Remove(ElevatorToAddOrRemove);
 
                     //Unsubscribe from an event, rised when passenger entered the elevator
                     ElevatorToAddOrRemove.PassengerEnteredTheElevator -= this.Floor_PassengerEnteredTheElevator;
@@ -127,17 +120,17 @@ namespace LiftSimulator
 
         public int GetMaximumAmmountOfPeopleInTheQueue()
         {
-            return maximumAmmountOfPeopleInTheQueue;
+            return _maximumAmmountOfPeopleInTheQueue;
         }
 
         public int GetCurrentAmmountOfPeopleInTheQueue()
         {
-            lock (locker) //The same lock is on add/remove passenger to the queue
+            lock (_locker) //The same lock is on add/remove passenger to the queue
             {
                 int CurrentAmmountOfPeopleInTheQueue = 0;
-                for (int i = 0; i < maximumAmmountOfPeopleInTheQueue; i++)
+                for (int i = 0; i < _maximumAmmountOfPeopleInTheQueue; i++)
                 {
-                    if (this.arrayOfPeopleWaitingForElevator[i] != null)
+                    if (this._arrayOfPeopleWaitingForElevator[i] != null)
                     {
                         CurrentAmmountOfPeopleInTheQueue++;
                     }
@@ -148,21 +141,21 @@ namespace LiftSimulator
 
         public Passenger[] GetArrayOfPeopleWaitingForElevator()
         {
-            return arrayOfPeopleWaitingForElevator;
+            return _arrayOfPeopleWaitingForElevator;
         }
 
         public List<Elevator> GetListOfElevatorsWaitingHere()
         {
             //Lock not needed. Method for passengers only.
-            lock (locker)
+            lock (_locker)
             {
-                return this.listOfElevatorsWaitingHere;
+                return this._listOfElevatorsWaitingHere;
             }
         }
 
         public int GetFloorLevelInPixels()
         {
-            return this.floorLevel;
+            return this._floorLevel;
         }
 
         #endregion
@@ -197,7 +190,7 @@ namespace LiftSimulator
 
         public void Floor_NewPassengerAppeared(object sender, EventArgs e)
         {
-            lock (locker)
+            lock (_locker)
             {
                 //Unsubscribe from this event (not needed anymore)
                 this.NewPassengerAppeared -= this.Floor_NewPassengerAppeared;
@@ -210,7 +203,7 @@ namespace LiftSimulator
 
         public void Floor_PassengerEnteredTheElevator(object sender, EventArgs e)
         {
-            lock (locker)
+            lock (_locker)
             {
                 Passenger PassengerWhoEnteredOrLeftTheElevator = ((PassengerEventArgs)e).PassengerWhoRisedAnEvent;
 

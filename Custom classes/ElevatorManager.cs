@@ -1,105 +1,102 @@
-﻿using LiftSimulator.Algorithm;
-using LiftSimulator.Custom_classes;
-using LiftSimulator.Interface;
-using System;
+﻿using LiftSimulator.Custom_classes;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Timers;
+using LiftSimulator.Abstracts;
+using LiftSimulator.Concrete;
+using Timer = System.Timers.Timer;
 
 namespace LiftSimulator
 {
-    public class ElevatorManager:Mediator
+    public class ElevatorManager : Mediator
     {
-        private readonly object locker = new object();
-        private Elevator[] _arrayElevator;
-        public Elevator[] ArrayOfAllElevators{get; set;}
-        private List<Elevator> _listElevator;
-        private Floor[] _array_Floor;
-        private System.Timers.Timer floorChecker;
-        IAlgorithmChoiceElevator algorithmChoiceElevator = new AlgorithmChoiceElevator();
+        private readonly object _locker = new object();
+        private readonly Elevator[] _arrayElevator;
+        private readonly List<Elevator> _listElevator;
+        private readonly Floor[] _arrayFloor;
+        IAlgorithmChoiceElevator _algorithmChoiceElevator = new AlgorithmChoiceElevator();
 
-        public ElevatorManager(Elevator[] ArrayOfAllElevators, Floor[] ArrayOfAllFloors)
+        public ElevatorManager(Elevator[] arrayOfAllElevators, Floor[] arrayOfAllFloors)
         {
-            this._arrayElevator = ArrayOfAllElevators;
-            for (int i = 0; i < _arrayElevator.Length; i++) {              
-            }
-
-            this._array_Floor = ArrayOfAllFloors;
-            this._listElevator = new List<Elevator>();
-            this.floorChecker = new System.Timers.Timer(1000);
-            this.floorChecker.Elapsed += new ElapsedEventHandler(this.ElevatorManager_TimerElapsed);
-            this.floorChecker.Start();
+            _arrayElevator = arrayOfAllElevators;
+            _arrayFloor = arrayOfAllFloors;
+            _listElevator = new List<Elevator>();
+            var floorChecker = new Timer(1000);
+            floorChecker.Elapsed += ElevatorManager_TimerElapsed;
+            floorChecker.Start();
         }
 
         public void AlgorithmChoiceElevatorStrategy(IAlgorithmChoiceElevator algorithmChoiceElevator)
         {
-            this.algorithmChoiceElevator = algorithmChoiceElevator;
+            _algorithmChoiceElevator = algorithmChoiceElevator;
         }
 
-        public void PassengerNeedsAnElevator(Floor PassengersFloor, Direction PassengersDirection)
+        public void PassengerNeedsAnElevator(Floor passengersFloor, Direction passengersDirection)
         {
-            lock (locker)
+            lock (_locker)
             {
-                if (PassengersDirection == Direction.up)
+                switch (passengersDirection)
                 {
-                    PassengersFloor.LampUp = true;
+                    case Direction.up:
+                        passengersFloor.LampUp = true;
+                        break;
+                    case Direction.down:
+                        passengersFloor.LampDown = true;
+                        break;
                 }
-                else if (PassengersDirection == Direction.down)
+
+                FreeElevator(passengersFloor);
+
+                var toGoElevator = _algorithmChoiceElevator.ChooseOptimalElevatorToSend(passengersFloor, _listElevator);
+
+                if (toGoElevator != null)
                 {
-                    PassengersFloor.LampDown = true;
+                    SendAnElevator(toGoElevator, passengersFloor);
                 }
-                FreeElevator(PassengersFloor, PassengersDirection);
-
-                Elevator ToGoElevator = algorithmChoiceElevator.ChooseOptimalElevatorToSend(PassengersFloor, _listElevator);
-
-                if (ToGoElevator != null)
-                {
-                    SendAnElevator(ToGoElevator, PassengersFloor);
-                }                
             }
         }
-        private void FreeElevator(Floor floor, Direction direct)
+
+        private void FreeElevator(Floor floor)
         {
             _listElevator.Clear();
-            for (int i = 0; i < _arrayElevator.Length; i++){
-                List<Floor> ListOfFloorsToVisit = _arrayElevator[i].GetListOfAllFloorsToVisit();
-                if (ListOfFloorsToVisit.Contains(floor)){
-                    _listElevator.Clear();
-                    return; 
-                }
-            }
-            for (int i = 0; i < _arrayElevator.Length; i++)
+            if (_arrayElevator.Select(t => t.GetListOfAllFloorsToVisit())
+                .Any(listOfFloorsToVisit => listOfFloorsToVisit.Contains(floor)))
             {
-                if (_arrayElevator[i].GetElevatorStatus() == ElevatorStatus.Idle) 
+                _listElevator.Clear();
+                return;
+            }
+
+            foreach (var t in _arrayElevator)
+            {
+                if (t.GetElevatorStatus() == ElevatorStatus.Idle)
                 {
-                    _listElevator.Add(_arrayElevator[i]);
+                    _listElevator.Add(t);
                 }
             }
         }
-        private void SendAnElevator(Elevator elevator, Floor floor)
-        {            
+
+        private static void SendAnElevator(Elevator elevator, Floor floor)
+        {
             elevator.AddNewFloorToTheList(floor);
-            ThreadPool.QueueUserWorkItem(delegate { elevator.PrepareElevatorToGoToNextFloorOnTheList(); });            
+            ThreadPool.QueueUserWorkItem(delegate { elevator.PrepareElevatorToGoToNextFloorOnTheList(); });
         }
 
         public void ElevatorManager_TimerElapsed(object sender, ElapsedEventArgs e)
         {
-            for (int i = 0; i < _array_Floor.Length; i++)
+            foreach (var t in _arrayFloor)
+            {
+                if (t.LampUp)
                 {
-                    if (_array_Floor[i].LampUp)
-                    {
-                        PassengerNeedsAnElevator(_array_Floor[i], Direction.up);
-                        Thread.Sleep(200);
-                    }
-                    else if(_array_Floor[i].LampDown)
-                    {
-                        PassengerNeedsAnElevator(_array_Floor[i], Direction.down);
-                        Thread.Sleep(200);
-                    }   
+                    PassengerNeedsAnElevator(t, Direction.up);
+                    Thread.Sleep(200);
                 }
+                else if (t.LampDown)
+                {
+                    PassengerNeedsAnElevator(t, Direction.down);
+                    Thread.Sleep(200);
+                }
+            }
         }
-
     }
 }

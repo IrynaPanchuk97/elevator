@@ -46,7 +46,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Algorithm\AlgorithmChoiceElevator.cs" />
+    <Compile Include="Concrete\AlgorithmChoiceElevator.cs" />
     <Compile Include="Custom classes\Building.cs" />
     <Compile Include="Custom classes\Colleague.cs" />
     <Compile Include="Custom classes\Mediator.cs" />
@@ -65,7 +65,7 @@
       <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
     <Compile Include="Custom classes\Passenger.cs" />
-    <Compile Include="Interface\IAlgorithmChoiceElevator.cs" />
+    <Compile Include="Abstracts\IAlgorithmChoiceElevator.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="Form1.resx">

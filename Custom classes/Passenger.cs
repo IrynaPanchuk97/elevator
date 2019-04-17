@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Drawing;
 
@@ -54,7 +52,7 @@ namespace LiftSimulator
             this.currentFloorIndex = CurrentFloor.FloorIndex;            
             this.passengerStatus = PassengerStatus.WaitingForAnElevator;
 
-            this.targetFloor = MyBuilding.arrayFloors[TargetFloorIndex];
+            this.targetFloor = MyBuilding.ArrayFloors[TargetFloorIndex];
             this.targetFloorIndex = TargetFloorIndex;
 
             this.PassengerPosition = new Point();
