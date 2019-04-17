@@ -1,53 +1,57 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Drawing;
 using System.Threading;
 using System.Timers;
+using LiftSimulator.Custom_classes;
 
 namespace LiftSimulator
 {
-     public class Elevator
+     public class Elevator:Colleague
      {
         #region FIELDS
 
-        private readonly object locker = new object();
+        private readonly object _locker = new object();
 
-        private readonly Building myBuilding;
+        private readonly Building _myBuilding;
 
-        private Floor currentFloor;
-        private readonly List<Floor> listOfFloorsToVisit;
-        private Direction elevatorDirection;
-        private ElevatorStatus elevatorStatus;
+        private Floor _currentFloor;
+        private readonly List<Floor> _listOfFloorsToVisit;
+        private Direction _elevatorDirection;
+        private ElevatorStatus _elevatorStatus;
 
-        private int maximumPeopleInside;
-        private List<Passenger> listOfPeopleInside;
-        private bool IsFull;
+        private readonly int _maximumPeopleInside;
+        private readonly List<Passenger> _listOfPeopleInside;
+        private bool _isFull;
 
-        private Point elevatorPosition;
-        private Bitmap[] elevatorFrames;
-        private int currentFrameNumber;
-        private int elevatorAnimationDelay;
-        private System.Timers.Timer elevatorTimer;
+        private Point _elevatorPosition;
+        private readonly Bitmap[] _elevatorFrames;
+        private int _currentFrameNumber;
+        private readonly int _elevatorAnimationDelay;
+        private readonly System.Timers.Timer _elevatorTimer;
+
+        #endregion
 
 
-        public Elevator(Building Mybuilding, int HorizontalPosition, Floor StartingFloor)
+        #region METHODS
+
+        public Elevator(Building myBuilding, int horizontalPosition, Floor startingFloor, Mediator mediator)
+            : base(mediator)
         {
-            this.myBuilding = Mybuilding;
+            _myBuilding = myBuilding;
 
-            this.currentFloor = StartingFloor;
-            this.listOfFloorsToVisit = new List<Floor>();
-            this.elevatorDirection = Direction.stop;
-            this.elevatorStatus = ElevatorStatus.Idle;
+            _currentFloor = startingFloor;
+            _listOfFloorsToVisit = new List<Floor>();
+            _elevatorDirection = Direction.stop;
+            _elevatorStatus = ElevatorStatus.Idle;
 
-            this.maximumPeopleInside = 2;
-            this.listOfPeopleInside = new List<Passenger>();
-            this.IsFull = false;
+            _maximumPeopleInside = 2;
+            _listOfPeopleInside = new List<Passenger>();
+            _isFull = false;
 
-            this.elevatorPosition = new Point(HorizontalPosition, currentFloor.GetFloorLevelInPixels());
-            currentFrameNumber = 0;
-            elevatorFrames = new Bitmap[]
+            _elevatorPosition = new Point(horizontalPosition, _currentFloor.GetFloorLevelInPixels());
+            _currentFrameNumber = 0;
+            _elevatorFrames = new[]
             {
                 Properties.Resources.LiftDoors_Open,
                 Properties.Resources.LiftDoors_4,
@@ -56,60 +60,75 @@ namespace LiftSimulator
                 Properties.Resources.LiftDoors_1,
                 Properties.Resources.LiftDoors_Closed
             };
-            this.elevatorAnimationDelay = 4;
-            this.elevatorTimer = new System.Timers.Timer(3000); //set timer to 6 seconds
-            this.elevatorTimer.Elapsed += new ElapsedEventHandler(this.Elevator_ElevatorTimerElapsed);
+            _elevatorAnimationDelay = 8;
+            _elevatorTimer = new System.Timers.Timer(6000); //set timer to 6 seconds
+            _elevatorTimer.Elapsed += Elevator_ElevatorTimerElapsed;
 
-            this.PassengerEnteredTheElevator += new EventHandler(this.Elevator_PassengerEnteredTheElevator);
+            PassengerEnteredTheElevator += Elevator_PassengerEnteredTheElevator;
 
             //Add new elevator to floor's list
-            currentFloor.AddRemoveElevatorToTheListOfElevatorsWaitingHere(this, true);
+            _currentFloor.AddRemoveElevatorToTheListOfElevatorsWaitingHere(this, true);
         }
 
         public void PrepareElevatorToGoToNextFloorOnTheList()
         {
+            //Method can be invoked from ElevatorManager thread (SendAnElevator()) or elevator's timer thread (Elevator_ElevatorTimerElapsed())
+
+            //Update elevator's status
             SetElevatorStatus(ElevatorStatus.PreparingForJob);
-            this.elevatorTimer.Stop();
-            currentFloor.AddRemoveElevatorToTheListOfElevatorsWaitingHere(this, false);
-            this.CloseTheDoor();
+
+            //Disable the timer
+            _elevatorTimer.Stop();
+
+            //Remove this elevator from current floor's list
+            _currentFloor.AddRemoveElevatorToTheListOfElevatorsWaitingHere(this, false);
+
+            //Close the door
+            CloseTheDoor();
+
+            //Go!
             GoToNextFloorOnTheList();
         }
 
         private void GoToNextFloorOnTheList()
-        {               
-            if (elevatorDirection == Direction.down) 
+        {
+            switch (_elevatorDirection)
             {
-                this.SetElevatorStatus(ElevatorStatus.GoingDown);
-                this.MoveTheElevatorGraphicDown(GetNextFloorToVisit().GetFloorLevelInPixels());
-            }
-            else if (elevatorDirection == Direction.up) //move up
-            {
-                this.SetElevatorStatus(ElevatorStatus.GoingUp);
-                this.MoveTheElevatorGraphicUp(GetNextFloorToVisit().GetFloorLevelInPixels());
+                //Move control on the UI                 
+                //move down
+                case Direction.down:
+                    SetElevatorStatus(ElevatorStatus.GoingDown);
+                    MoveTheElevatorGraphicDown(GetNextFloorToVisit().GetFloorLevelInPixels());
+                    break;
+                //move up
+                case Direction.up:
+                    SetElevatorStatus(ElevatorStatus.GoingUp);
+                    MoveTheElevatorGraphicUp(GetNextFloorToVisit().GetFloorLevelInPixels());
+                    break;
             }
 
             //Update currentFloor
-            this.currentFloor = GetNextFloorToVisit();
+            _currentFloor = GetNextFloorToVisit();
 
             //Remove current floor from the list of floors to visit
-            this.listOfFloorsToVisit.RemoveAt(0);
+            _listOfFloorsToVisit.RemoveAt(0);
 
             //Update elevator's direction
             UpdateElevatorDirection();
 
             //If one of passengers inside wants to get out here or this is end of the road,
             //then finalize going to next floor on the list
-            if (SomePassengersWantsToGetOutOnThisFloor() || (this.elevatorDirection == Direction.stop))
+            if (SomePassengersWantsToGetOutOnThisFloor() || (_elevatorDirection == Direction.stop))
             {
                 FinalizeGoingToNextFloorOnTheList();
                 return;
             }
 
             //If elevator is not full, then check lamps on the floor
-            if (!this.IsFull)
+            if (!_isFull)
             {
-                if (((this.elevatorDirection == Direction.up) && (currentFloor.LampUp)) ||
-                ((this.elevatorDirection == Direction.down) && (currentFloor.LampDown)))
+                if ((_elevatorDirection == Direction.up) && _currentFloor.LampUp ||
+                ((_elevatorDirection == Direction.down) && (_currentFloor.LampDown)))
                 {
                     FinalizeGoingToNextFloorOnTheList();
                     return;
@@ -123,19 +142,17 @@ namespace LiftSimulator
         private void FinalizeGoingToNextFloorOnTheList()
         {
             //Reset appropriate lamp on current floor
-            switch (this.elevatorDirection)
+            switch (this._elevatorDirection)
             {
                 case Direction.up:
-                    currentFloor.LampUp = false;
+                    _currentFloor.LampUp = false;
                     break;
                 case Direction.down:
-                    currentFloor.LampDown = false;
+                    _currentFloor.LampDown = false;
                     break;
                 case Direction.stop:
-                    currentFloor.LampUp = false;
-                    currentFloor.LampDown = false;
-                    break;
-                default:
+                    _currentFloor.LampUp = false;
+                    _currentFloor.LampDown = false;
                     break;
             }
 
@@ -146,53 +163,53 @@ namespace LiftSimulator
             SetElevatorStatus(ElevatorStatus.WaitingForPassengersToGetInAndGetOut);
 
             //Inform all passengers inside
-            List<Passenger> PassengersInsideTheElevator = new List<Passenger>(listOfPeopleInside);
-            foreach (Passenger SinglePassengerInsideTheElevator in PassengersInsideTheElevator)
+            var passengersInsideTheElevator = new List<Passenger>(_listOfPeopleInside);
+            foreach (var singlePassengerInsideTheElevator in passengersInsideTheElevator)
             {
-                SinglePassengerInsideTheElevator.ElevatorReachedNextFloor();
-                Thread.Sleep(SinglePassengerInsideTheElevator.GetAnimationDelay() * 40); //to make sure all passengers will be visible when leaving the building
+                singlePassengerInsideTheElevator.ElevatorReachedNextFloor();
+                Thread.Sleep(singlePassengerInsideTheElevator.GetAnimationDelay() * 40); //to make sure all passengers will be visible when leaving the building
             }
 
             //Add this elevator to next floor's list
-            currentFloor.AddRemoveElevatorToTheListOfElevatorsWaitingHere(this, true);
+            _currentFloor.AddRemoveElevatorToTheListOfElevatorsWaitingHere(this, true);
 
             //Rise an event on current floor to inform passengers, who await
-            currentFloor.OnElevatorHasArrivedOrIsNoteFullAnymore(new ElevatorEventArgs(this));
+            _currentFloor.OnElevatorHasArrivedOrIsNoteFullAnymore(new ElevatorEventArgs(this));
 
             //Enable the timer            
-            this.elevatorTimer.Start();
+            _elevatorTimer.Start();
         }
 
-        public void AddNewFloorToTheList(Floor FloorToBeAdded)
+        public void AddNewFloorToTheList(Floor floorToBeAdded)
         {
-            lock (locker) //Method can be invoked from ElevatorManager thread (SendAnElevator()) or passenger's thread (AddNewPassengerIfPossible())
+            lock (_locker) //Method can be invoked from ElevatorManager thread (SendAnElevator()) or passenger's thread (AddNewPassengerIfPossible())
             {
                 //If FloorToBeAdded is already on the list, do nothing
-                if (GetListOfAllFloorsToVisit().Contains(FloorToBeAdded))
+                if (GetListOfAllFloorsToVisit().Contains(floorToBeAdded))
                 {
                     return;
                 }
 
                 //If elevator is going up
-                if (this.currentFloor.FloorIndex < FloorToBeAdded.FloorIndex)
+                if (_currentFloor.FloorIndex < floorToBeAdded.FloorIndex)
                 {
-                    for (int i = this.currentFloor.FloorIndex + 1; i <= FloorToBeAdded.FloorIndex; i++)
+                    for (var i = _currentFloor.FloorIndex + 1; i <= floorToBeAdded.FloorIndex; i++)
                     {
-                        if (!GetListOfAllFloorsToVisit().Contains(myBuilding.arrayFloor[i]))
+                        if (!GetListOfAllFloorsToVisit().Contains(_myBuilding.ArrayFloors[i]))
                         {
-                            GetListOfAllFloorsToVisit().Add(myBuilding.arrayFloor[i]);
+                            GetListOfAllFloorsToVisit().Add(_myBuilding.ArrayFloors[i]);
                         }
                     }
                 }
 
                 //If elevator is going down
-                if (this.currentFloor.FloorIndex > FloorToBeAdded.FloorIndex)
+                if (_currentFloor.FloorIndex > floorToBeAdded.FloorIndex)
                 {
-                    for (int i = this.currentFloor.FloorIndex - 1; i >= FloorToBeAdded.FloorIndex; i--)
+                    for (var i = _currentFloor.FloorIndex - 1; i >= floorToBeAdded.FloorIndex; i--)
                     {
-                        if (!GetListOfAllFloorsToVisit().Contains(myBuilding.arrayFloor[i]))
+                        if (!GetListOfAllFloorsToVisit().Contains(_myBuilding.ArrayFloors[i]))
                         {
-                            this.GetListOfAllFloorsToVisit().Add(myBuilding.arrayFloor[i]);
+                            GetListOfAllFloorsToVisit().Add(_myBuilding.ArrayFloors[i]);
                         }
                     }
                 }
@@ -204,9 +221,9 @@ namespace LiftSimulator
 
         private bool SomePassengersWantsToGetOutOnThisFloor()
         {
-            foreach (Passenger PassengerInsideThElevator in listOfPeopleInside)
+            foreach (var passengerInsideThElevator in _listOfPeopleInside)
             {
-                if (PassengerInsideThElevator.GetTargetFloor() == this.currentFloor)
+                if (passengerInsideThElevator.GetTargetFloor() == this._currentFloor)
                 {
                     return true;
                 }
@@ -216,29 +233,22 @@ namespace LiftSimulator
 
         public Floor GetCurrentFloor()
         {
-            return currentFloor;
+            return _currentFloor;
         }
 
         private Floor GetNextFloorToVisit()
         {
-            lock (locker) //To avoid e.g. adding new element and checking whole list at the same time
+            lock (_locker) //To avoid e.g. adding new element and checking whole list at the same time
             {
-                if (listOfFloorsToVisit.Count > 0)
-                {
-                    return this.listOfFloorsToVisit[0];
-                }
-                else
-                {
-                    return null;
-                }
+                return _listOfFloorsToVisit.Count > 0 ? this._listOfFloorsToVisit[0] : null;
             }
         }
 
         public List<Floor> GetListOfAllFloorsToVisit()
         {
-            lock (locker) //To avoid e.g. adding new element and checking whole list at the same time
+            lock (_locker) //To avoid e.g. adding new element and checking whole list at the same time
             {
-                return listOfFloorsToVisit;
+                return _listOfFloorsToVisit;
             }
         }
 
@@ -248,104 +258,99 @@ namespace LiftSimulator
             //AddNewFloorToTheList method is the only reference for this method and it has its own lock         
             if (GetNextFloorToVisit() == null)
             {
-                this.elevatorDirection = Direction.stop;
+                this._elevatorDirection = Direction.stop;
                 return;
             }
 
-            if (currentFloor.FloorIndex < GetNextFloorToVisit().FloorIndex)
-            {
-                this.elevatorDirection = Direction.up;
-            }
-            else
-            {
-                this.elevatorDirection = Direction.down;
-            }
+            this._elevatorDirection = _currentFloor.FloorIndex < GetNextFloorToVisit().FloorIndex ? Direction.up : Direction.down;
         }
 
-        public bool AddNewPassengerIfPossible(Passenger NewPassenger, Floor TargetFloor)
+        public bool AddNewPassengerIfPossible(Passenger newPassenger, Floor targetFloor)
         {
             //Passengers are added synchronically. Lock not needed.
 
-            if (!IsFull && //check, if there is a place for another passenger
-                ((GetElevatorStatus() == ElevatorStatus.Idle) || (GetElevatorStatus() == ElevatorStatus.WaitingForPassengersToGetInAndGetOut)))
+            if (_isFull || ((GetElevatorStatus() != ElevatorStatus.Idle) &&
+                            (GetElevatorStatus() != ElevatorStatus.WaitingForPassengersToGetInAndGetOut)))
             {
-                //Reset elevator timer, so the passenger has time to get in
-                this.ResetElevatorTimer();
+                return false; //new passenger not added due to lack of space in the elevator      
+            }
 
-                this.listOfPeopleInside.Add(NewPassenger); //add new passenger
-                this.AddNewFloorToTheList(TargetFloor); //add new floor                    
-                if (this.listOfPeopleInside.Count >= this.maximumPeopleInside) //set flag, if needed
-                {
-                    this.IsFull = true;
-                    this.SetElevatorStatus(ElevatorStatus.PreparingForJob); // to prevent other passengers attempt to get in
-                }
+            //Reset elevator timer, so the passenger has time to get in
+            this.ResetElevatorTimer();
 
+            this._listOfPeopleInside.Add(newPassenger); //add new passenger
+            this.AddNewFloorToTheList(targetFloor); //add new floor                    
+            if (this._listOfPeopleInside.Count < this._maximumPeopleInside)
+            {
                 return true; //new passenger added successfully
             }
-            else
-                return false; //new passenger not added due to lack of space in the elevator            
+
+            this._isFull = true;
+            this.SetElevatorStatus(ElevatorStatus.PreparingForJob); // to prevent other passengers attempt to get in
+
+            return true; //new passenger added successfully
         }
 
-        public void RemovePassenger(Passenger PassengerToRemove)
+        public void RemovePassenger(Passenger passengerToRemove)
         {
-            lock (locker) //Can be invoked by multiple passengers at once
+            lock (_locker) //Can be invoked by multiple passengers at once
             {
-                this.listOfPeopleInside.Remove(PassengerToRemove);
-                this.IsFull = false;
+                this._listOfPeopleInside.Remove(passengerToRemove);
+                this._isFull = false;
             }
         }
 
         public void ResetElevatorTimer()
         {
-            lock (locker)
+            lock (_locker)
             {
-                this.elevatorTimer.Stop();
-                this.elevatorTimer.Start();
+                this._elevatorTimer.Stop();
+                this._elevatorTimer.Start();
             }
         }
 
-        private void MoveTheElevatorGraphicDown(int DestinationLevel)
+        private void MoveTheElevatorGraphicDown(int destinationLevel)
         {
-            for (int i = this.GetElevatorYPosition(); i <= DestinationLevel; i++)
+            for (var i = this.GetElevatorYPosition(); i <= destinationLevel; i++)
             {
-                Thread.Sleep(this.elevatorAnimationDelay);
-                this.elevatorPosition = new Point(GetElevatorXPosition(), i);
+                Thread.Sleep(this._elevatorAnimationDelay);
+                this._elevatorPosition = new Point(GetElevatorXPosition(), i);
             }
         }
 
-        private void MoveTheElevatorGraphicUp(int DestinationLevel)
+        private void MoveTheElevatorGraphicUp(int destinationLevel)
         {
-            for (int i = this.GetElevatorYPosition(); i >= DestinationLevel; i--)
+            for (int i = this.GetElevatorYPosition(); i >= destinationLevel; i--)
             {
-                Thread.Sleep(this.elevatorAnimationDelay);
-                this.elevatorPosition = new Point(GetElevatorXPosition(), i);
+                Thread.Sleep(this._elevatorAnimationDelay);
+                this._elevatorPosition = new Point(GetElevatorXPosition(), i);
             }
         }
 
         private void CloseTheDoor()
         {
-            for (int i = 0; i < 5; i++)
+            for (var i = 0; i < 5; i++)
             {
-                switch (this.currentFrameNumber)
+                switch (this._currentFrameNumber)
                 {
                     case (0):
-                        this.currentFrameNumber = 1;
+                        this._currentFrameNumber = 1;
                         Thread.Sleep(100);
                         break;
                     case (1):
-                        this.currentFrameNumber = 2;
+                        this._currentFrameNumber = 2;
                         Thread.Sleep(100);
                         break;
                     case (2):
-                        this.currentFrameNumber = 3;
+                        this._currentFrameNumber = 3;
                         Thread.Sleep(100);
                         break;
                     case (3):
-                        this.currentFrameNumber = 4;
+                        this._currentFrameNumber = 4;
                         Thread.Sleep(100);
                         break;
                     case (4):
-                        this.currentFrameNumber = 5;
+                        this._currentFrameNumber = 5;
                         Thread.Sleep(100);
                         break;
                 }
@@ -354,28 +359,28 @@ namespace LiftSimulator
 
         private void OpenTheDoor()
         {
-            for (int i = 0; i < 5; i++)
+            for (var i = 0; i < 5; i++)
             {
-                switch (this.currentFrameNumber)
+                switch (this._currentFrameNumber)
                 {
                     case (5):
-                        this.currentFrameNumber = 4;
+                        this._currentFrameNumber = 4;
                         Thread.Sleep(100);
                         break;
                     case (4):
-                        this.currentFrameNumber = 3;
+                        this._currentFrameNumber = 3;
                         Thread.Sleep(100);
                         break;
                     case (3):
-                        this.currentFrameNumber = 2;
+                        this._currentFrameNumber = 2;
                         Thread.Sleep(100);
                         break;
                     case (2):
-                        this.currentFrameNumber = 1;
+                        this._currentFrameNumber = 1;
                         Thread.Sleep(100);
                         break;
                     case (1):
-                        this.currentFrameNumber = 0;
+                        this._currentFrameNumber = 0;
                         Thread.Sleep(100);
                         break;
                 }
@@ -384,40 +389,40 @@ namespace LiftSimulator
 
         public int GetElevatorXPosition()
         {
-            return this.elevatorPosition.X;
+            return this._elevatorPosition.X;
         }
 
         public int GetElevatorYPosition()
         {
-            return this.elevatorPosition.Y;
+            return this._elevatorPosition.Y;
         }
 
         public Bitmap GetCurrentFrame()
         {
-            return this.elevatorFrames[currentFrameNumber];
+            return this._elevatorFrames[_currentFrameNumber];
         }
 
         public ElevatorStatus GetElevatorStatus()
         {
-            lock (locker) 
+            lock (_locker) //To avoid e.g. setting and getting status at the same time
             {
-                return this.elevatorStatus;
+                return this._elevatorStatus;
             }
         }
 
-        private void SetElevatorStatus(ElevatorStatus Status)
+        private void SetElevatorStatus(ElevatorStatus status)
         {
-            lock (locker) //To avoid e.g. setting and getting status at the same time
+            lock (_locker) //To avoid e.g. setting and getting status at the same time
             {
-                this.elevatorStatus = Status;
+                this._elevatorStatus = status;
             }
         }
 
         public Direction GetElevatorDirection()
         {
-            lock (locker) //To avoid reading during updating the elevatorDirection
+            lock (_locker) //To avoid reading during updating the elevatorDirection
             {
-                return elevatorDirection;
+                return _elevatorDirection;
             }
         }
 
@@ -433,8 +438,10 @@ namespace LiftSimulator
         }
 
         public event EventHandler ElevatorIsFull;
-        public void OnElevatorIsFullAndHasToGoDown(EventArgs e)=> ElevatorIsFull?.Invoke(this, e);
- 
+        public void OnElevatorIsFullAndHasToGoDown(EventArgs e)
+        {
+            ElevatorIsFull?.Invoke(this, e);
+        }
 
         #endregion
 
@@ -451,7 +458,7 @@ namespace LiftSimulator
         {
             if (GetNextFloorToVisit() == null)
             {
-                elevatorTimer.Stop();
+                _elevatorTimer.Stop();
                 SetElevatorStatus(ElevatorStatus.Idle);
             }
             else

@@ -46,7 +46,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Algorithm\AlgorithmChoiceElevator.cs" />
+    <Compile Include="Concrete\AlgorithmChoiceElevator.cs" />
     <Compile Include="Custom classes\Building.cs" />
     <Compile Include="CustomTypes\DirectionEnum.cs" />
     <Compile Include="CustomTypes\ElevatorEventArgs.cs" />
@@ -54,12 +54,6 @@
     <Compile Include="Custom classes\Elevator.cs" />
     <Compile Include="Custom classes\ElevatorManager.cs" />
     <Compile Include="Custom classes\Floor.cs" />
-    <Compile Include="Custom dialogs\FloorSelectionDialog.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Custom dialogs\FloorSelectionDialog.Designer.cs">
-      <DependentUpon>FloorSelectionDialog.cs</DependentUpon>
-    </Compile>
     <Compile Include="CustomTypes\PassengerEventArgs.cs" />
     <Compile Include="CustomTypes\PassengerStatusEnum.cs" />
     <Compile Include="Form1.cs">
@@ -68,24 +62,12 @@
     <Compile Include="Form1.Designer.cs">
       <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
-    <Compile Include="Custom controls\NewPassengerButton.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="Custom controls\NewPassengerButton.Designer.cs">
-      <DependentUpon>NewPassengerButton.cs</DependentUpon>
-    </Compile>
     <Compile Include="Custom classes\Passenger.cs" />
-    <Compile Include="Interface\IAlgorithmChoiceElevator.cs" />
+    <Compile Include="Abstracts\IAlgorithmChoiceElevator.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <EmbeddedResource Include="Custom dialogs\FloorSelectionDialog.resx">
-      <DependentUpon>FloorSelectionDialog.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Custom controls\NewPassengerButton.resx">
-      <DependentUpon>NewPassengerButton.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
