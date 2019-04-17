@@ -26,16 +26,16 @@ namespace LiftSimulator
 
         private void PaintElevators(Graphics g)
         {
-            for (int i = 0; i < MyBuilding.arrayElevator.Length; i++)
+            for (int i = 0; i < MyBuilding.ArrayOfAllElevators.Length; i++)
             {
-                Elevator ElevatorToPaint = MyBuilding.arrayElevator[i];
+                Elevator ElevatorToPaint = MyBuilding.ArrayOfAllElevators[i];
                 g.DrawImage(ElevatorToPaint.GetCurrentFrame(), ElevatorToPaint.GetElevatorXPosition(), ElevatorToPaint.GetElevatorYPosition(), 54, 90);
             }
         }
 
         private void PaintPassengers(Graphics g)
         {
-            List<Passenger> CopyOfListOfAllPeopleWhoNeedAnimation = new List<Passenger>(MyBuilding.listeople);
+            List<Passenger> CopyOfListOfAllPeopleWhoNeedAnimation = new List<Passenger>(MyBuilding.ListOfAllPeopleWhoNeedAnimation);
 
             foreach (Passenger PassengerToPaint in CopyOfListOfAllPeopleWhoNeedAnimation)
             {

@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Timers;
 
 namespace LiftSimulator
 {
@@ -10,8 +12,37 @@ namespace LiftSimulator
         public Elevator[] ArrayOfAllElevators { get; }
         public int ExitLocation { get; }
 
+        private static Timer aTimer;
+
+        public void CreatePassenger(object source, ElapsedEventArgs e)
+        {
+            var randStartIndex = new Random();
+            var randEndIndex = new Random();
+            var startIndex = randStartIndex.Next(0, 4);
+            var endIndex = randEndIndex.Next(0, 4);
+
+            while (endIndex == startIndex)
+            {
+                endIndex = randEndIndex.Next(0, 4);
+            }
+
+
+            var pas = new Passenger(this, ArrayFloors[startIndex], endIndex);
+            ArrayFloors[startIndex].OnNewPassengerAppeared(new PassengerEventArgs(pas));
+        }
+
+
         public Building()
         {
+            aTimer = new Timer(10000);
+
+            // Hook up the Elapsed event for the timer.
+            aTimer.Elapsed += CreatePassenger;
+
+            // Set the Interval to 2 seconds (2000 milliseconds).
+            aTimer.Interval = 5000;
+            aTimer.Enabled = true;
+
             ExitLocation = 677;
             ArrayFloors = new Floor[4];
             ArrayFloors[0] = new Floor(this, 0, 373);

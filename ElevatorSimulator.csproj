@@ -52,6 +52,8 @@
     <Compile Include="CustomTypes\ElevatorEventArgs.cs" />
     <Compile Include="CustomTypes\ElevatorStatusEnum.cs" />
     <Compile Include="Custom classes\Elevator.cs" />
+    <Compile Include="Custom classes\Colleague.cs" />
+    <Compile Include="Custom classes\Mediator.cs" />
     <Compile Include="Custom classes\ElevatorManager.cs" />
     <Compile Include="Custom classes\Floor.cs" />
     <Compile Include="CustomTypes\PassengerEventArgs.cs" />
