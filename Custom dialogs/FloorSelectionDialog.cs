@@ -43,6 +43,7 @@ namespace LiftSimulator
         }
 
         public FloorSelectionDialog()=>   InitializeComponent();
+       
         private void floorsComboBox_SelectedIndexChanged(object sender, EventArgs e)=> buttonOK.Select();
         private void ButtonOK_Click(object sender, EventArgs e) { }
     }

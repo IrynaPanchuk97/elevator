@@ -34,7 +34,8 @@ namespace LiftSimulator
 
         public void AlgorithmChoiceElevatorStrategy(IAlgorithmChoiceElevator algorithmChoiceElevator)
         {
-            this.algorithmChoiceElevator = algorithmChoiceElevator;
+            // this.algorithmChoiceElevator = algorithmChoiceElevator;
+            this.algorithmChoiceElevator = new AlgorithmChoiceElevator2();
         }
 
         public void PassengerNeedsAnElevator(Floor PassengersFloor, Direction PassengersDirection)

@@ -47,7 +47,6 @@ namespace LiftSimulator
         }
 
 
-        #region EVENT HANDLERS
 
         private void timerRefresh_Tick(object sender, EventArgs e)=> this.Invalidate();
 
@@ -59,8 +58,5 @@ namespace LiftSimulator
             PaintElevators(g);
             PaintPassengers(g);
         }
-
-        #endregion EVENT HANDLERS
-
     }
 }

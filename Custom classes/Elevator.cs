@@ -56,8 +56,8 @@ namespace LiftSimulator
                 Properties.Resources.LiftDoors_1,
                 Properties.Resources.LiftDoors_Closed
             };
-            this.elevatorAnimationDelay = 8;
-            this.elevatorTimer = new System.Timers.Timer(6000); //set timer to 6 seconds
+            this.elevatorAnimationDelay = 4;
+            this.elevatorTimer = new System.Timers.Timer(3000); //set timer to 6 seconds
             this.elevatorTimer.Elapsed += new ElapsedEventHandler(this.Elevator_ElevatorTimerElapsed);
 
             this.PassengerEnteredTheElevator += new EventHandler(this.Elevator_PassengerEnteredTheElevator);
@@ -68,28 +68,16 @@ namespace LiftSimulator
 
         public void PrepareElevatorToGoToNextFloorOnTheList()
         {
-            //Method can be invoked from ElevatorManager thread (SendAnElevator()) or elevator's timer thread (Elevator_ElevatorTimerElapsed())
-
-            //Update elevator's status
             SetElevatorStatus(ElevatorStatus.PreparingForJob);
-
-            //Disable the timer
             this.elevatorTimer.Stop();
-
-            //Remove this elevator from current floor's list
             currentFloor.AddRemoveElevatorToTheListOfElevatorsWaitingHere(this, false);
-
-            //Close the door
             this.CloseTheDoor();
-
-            //Go!
             GoToNextFloorOnTheList();
         }
 
         private void GoToNextFloorOnTheList()
-        {
-            //Move control on the UI                 
-            if (elevatorDirection == Direction.down) //move down
+        {               
+            if (elevatorDirection == Direction.down) 
             {
                 this.SetElevatorStatus(ElevatorStatus.GoingDown);
                 this.MoveTheElevatorGraphicDown(GetNextFloorToVisit().GetFloorLevelInPixels());
@@ -411,7 +399,7 @@ namespace LiftSimulator
 
         public ElevatorStatus GetElevatorStatus()
         {
-            lock (locker) //To avoid e.g. setting and getting status at the same time
+            lock (locker) 
             {
                 return this.elevatorStatus;
             }
