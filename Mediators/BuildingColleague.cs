@@ -13,5 +13,10 @@
         {
             _mediator.SomethingChangesOnUi(this);
         }
+
+        public void AddPersonToListOfWhoNeedAnimation(int personPositionInQueue, int floorIndex)
+        {
+            _mediator.AddPersonToListOfWhoNeedAnimation(this, personPositionInQueue, floorIndex);
+        }
     }
 }

@@ -23,9 +23,11 @@ namespace LiftSimulator.ViewModels
             new Bitmap(Properties.Resources.Seven)
         };
 
-        public PersonViewModel()
+        public PersonViewModel(int personPositionInQueue, int floorIndex)
         {
-            PersonPosition = new Point();
+            var beginOfTheQueue = 367;
+            var widthOfSlotForSinglePassenger = 46;
+            PersonPosition = new Point(beginOfTheQueue + widthOfSlotForSinglePassenger * personPositionInQueue, 32+ 112*floorIndex );
             Visible = true;
             var random = new Random();
             _passengerAnimationDelay = 8;

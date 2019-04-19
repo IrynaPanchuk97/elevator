@@ -15,13 +15,13 @@ namespace LiftSimulator
     {
 
         public Building MyBuilding;
-        public BuildingViewModel Building;
+        public BuildingMediator Building;
 
         public Form1()
         {
             InitializeComponent();
             MyBuilding = new Building();
-            Building = new BuildingViewModel(new BuildingMediator());
+            Building = new BuildingMediator();
         }
 
         private void PaintBuilding(Graphics g)
@@ -31,9 +31,9 @@ namespace LiftSimulator
 
         private void PaintElevators(Graphics g)
         {
-            for (int i = 0; i < Building.Elevators.Count; i++)
+            for (int i = 0; i < Building.BuildingView.Elevators.Count; i++)
             {
-                var elevator = Building.Elevators[i];
+                var elevator = Building.BuildingView.Elevators[i];
                 g.DrawImage(elevator.GetCurrentFrame(), elevator.ElevatorPosition.X, elevator.ElevatorPosition.Y, 54, 90);
             }
 
@@ -47,7 +47,7 @@ namespace LiftSimulator
 
         private void PaintPassengers(Graphics g)
         {
-            var copyOfListOfAllPeopleWhoNeedAnimation = Building.ListOfAllPeopleWhoNeedAnimation;
+            var copyOfListOfAllPeopleWhoNeedAnimation = Building.BuildingView.ListOfAllPeopleWhoNeedAnimation;
 
             foreach (var passengerToPaint in copyOfListOfAllPeopleWhoNeedAnimation)
             {

@@ -12,7 +12,7 @@ namespace LiftSimulator.Models
         {
             FloorNumber = floorNumber;
             Building = building;
-            FloorPersonsQuery = new FloorPersonsQuery();
+            FloorPersonsQuery = new FloorPersonsQuery(this);
         }
     }
 }

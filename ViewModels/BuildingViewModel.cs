@@ -21,9 +21,9 @@ namespace LiftSimulator.ViewModels
             ListOfAllPeopleWhoNeedAnimation = new List<PersonViewModel>();
         }
 
-        public void AddPersonToListOfWhoNeedAnimation()
+        public void AddPersonView(int personPositionInQueue, int floorIndex)
         {
-            ListOfAllPeopleWhoNeedAnimation.Add(new PersonViewModel());
+            ListOfAllPeopleWhoNeedAnimation.Add(new PersonViewModel(personPositionInQueue, floorIndex));
         }
     }
 }

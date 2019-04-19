@@ -9,13 +9,11 @@ namespace LiftSimulator.Concrete
         public PersonModel[] ArrayOfPeopleWaitingForElevator { get; set; }
         public int MaximumAmountOfPeopleInTheQueue { get; set; }
 
-        public PersonModel LastAddedPerson { get; set; }
-
         public FloorPersonsQuery(FloorModel floor)
         {
             Floor = floor;
-            ArrayOfPeopleWaitingForElevator = new PersonModel[MaximumAmountOfPeopleInTheQueue];
             MaximumAmountOfPeopleInTheQueue = 8;
+            ArrayOfPeopleWaitingForElevator = new PersonModel[MaximumAmountOfPeopleInTheQueue];
         }
 
         public bool AddPersonToTheQueue(PersonModel personToAdd)
@@ -27,7 +25,7 @@ namespace LiftSimulator.Concrete
             }
 
             ArrayOfPeopleWaitingForElevator[firstFreeSlotInQueue.Value] = personToAdd;
-            LastAddedPerson = personToAdd;
+            Floor.Building.AddPersonToListOfWhoNeedAnimation(firstFreeSlotInQueue.Value, Floor.FloorNumber);
             return true;
         }
 

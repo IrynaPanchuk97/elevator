@@ -35,6 +35,7 @@ namespace LiftSimulator.ConcreteServices
             }
 
             var personModel = new PersonModel(_building, startFloorIndex, endFloorIndex);
+            _building.NeedUiChanges();
         }
     }
 }
