@@ -5,13 +5,17 @@ namespace LiftSimulator.Concrete
 {
     public class FloorPersonsQuery
     {
+        public FloorModel Floor { get; set; }
         public PersonModel[] ArrayOfPeopleWaitingForElevator { get; set; }
         public int MaximumAmountOfPeopleInTheQueue { get; set; }
 
-        public FloorPersonsQuery()
+        public PersonModel LastAddedPerson { get; set; }
+
+        public FloorPersonsQuery(FloorModel floor)
         {
-            MaximumAmountOfPeopleInTheQueue = 8;
+            Floor = floor;
             ArrayOfPeopleWaitingForElevator = new PersonModel[MaximumAmountOfPeopleInTheQueue];
+            MaximumAmountOfPeopleInTheQueue = 8;
         }
 
         public bool AddPersonToTheQueue(PersonModel personToAdd)
@@ -23,6 +27,7 @@ namespace LiftSimulator.Concrete
             }
 
             ArrayOfPeopleWaitingForElevator[firstFreeSlotInQueue.Value] = personToAdd;
+            LastAddedPerson = personToAdd;
             return true;
         }
 

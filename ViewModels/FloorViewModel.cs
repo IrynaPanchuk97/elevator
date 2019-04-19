@@ -1,8 +1,6 @@
-﻿using LiftSimulator.Mediators;
-
-namespace LiftSimulator.ViewModels
+﻿namespace LiftSimulator.ViewModels
 {
-    public class FloorViewModel : FloorColleague
+    public class FloorViewModel
     {
         public int FloorLevel { get; set; }
 
@@ -10,7 +8,7 @@ namespace LiftSimulator.ViewModels
 
         private readonly int _widthOfSlotForSinglePassenger;   
 
-        public FloorViewModel(FloorMediator mediator) : base(mediator)
+        public FloorViewModel()
         {
             _beginOfTheQueue = 367;
             _widthOfSlotForSinglePassenger = 46;

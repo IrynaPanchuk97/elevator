@@ -1,9 +1,7 @@
-﻿using LiftSimulator.Models;
-
-namespace LiftSimulator.AbstractServices
+﻿namespace LiftSimulator.AbstractServices
 {
     public interface IPersonGenerator
     {
-        PersonModel AddPerson();
+        void GeneratePerson();
     }
 }

@@ -5,7 +5,7 @@ namespace LiftSimulator.Mediators
 {
     public class FloorMediator
     {
-        public FloorViewModel FloorView { get; private set; }
+        //public FloorViewModel FloorView { get; private set; }
 
         public FloorMediator()
         {
@@ -14,7 +14,7 @@ namespace LiftSimulator.Mediators
 
         private void CreateComponents()
         {
-            FloorView = new FloorViewModel(this);
+            //FloorView = new FloorViewModel(this);
         }
 
         public void SomethingChangesOnUi(FloorColleague colleague)

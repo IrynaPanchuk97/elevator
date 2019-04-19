@@ -6,6 +6,8 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using LiftSimulator.Mediators;
+using LiftSimulator.ViewModels;
 
 namespace LiftSimulator
 {
@@ -13,10 +15,13 @@ namespace LiftSimulator
     {
 
         public Building MyBuilding;
+        public BuildingViewModel Building;
+
         public Form1()
         {
             InitializeComponent();
             MyBuilding = new Building();
+            Building = new BuildingViewModel(new BuildingMediator());
         }
 
         private void PaintBuilding(Graphics g)
@@ -26,23 +31,28 @@ namespace LiftSimulator
 
         private void PaintElevators(Graphics g)
         {
-            for (int i = 0; i < MyBuilding.ArrayOfAllElevators.Length; i++)
+            for (int i = 0; i < Building.Elevators.Count; i++)
             {
-                Elevator ElevatorToPaint = MyBuilding.ArrayOfAllElevators[i];
-                g.DrawImage(ElevatorToPaint.GetCurrentFrame(), ElevatorToPaint.GetElevatorXPosition(), ElevatorToPaint.GetElevatorYPosition(), 54, 90);
+                var elevator = Building.Elevators[i];
+                g.DrawImage(elevator.GetCurrentFrame(), elevator.ElevatorPosition.X, elevator.ElevatorPosition.Y, 54, 90);
             }
+
+
+            //for (int i = 0; i < MyBuilding.ArrayOfAllElevators.Length; i++)
+            //{
+            //    Elevator ElevatorToPaint = MyBuilding.ArrayOfAllElevators[i];
+            //    g.DrawImage(ElevatorToPaint.GetCurrentFrame(), ElevatorToPaint.GetElevatorXPosition(), ElevatorToPaint.GetElevatorYPosition(), 54, 90);
+            //}
         }
 
         private void PaintPassengers(Graphics g)
         {
-            List<Passenger> CopyOfListOfAllPeopleWhoNeedAnimation = new List<Passenger>(MyBuilding.ListOfAllPeopleWhoNeedAnimation);
+            var copyOfListOfAllPeopleWhoNeedAnimation = Building.ListOfAllPeopleWhoNeedAnimation;
 
-            foreach (Passenger PassengerToPaint in CopyOfListOfAllPeopleWhoNeedAnimation)
+            foreach (var passengerToPaint in copyOfListOfAllPeopleWhoNeedAnimation)
             {
-                if ((PassengerToPaint != null) && (PassengerToPaint.GetPassengerVisibility()))
-                {
-                    g.DrawImage(PassengerToPaint.GetCurrentFrame(), PassengerToPaint.PassengerPosition.X, PassengerToPaint.PassengerPosition.Y + 15, 35, 75); 
-                }
+                g.DrawImage(passengerToPaint.PersonGraphic, passengerToPaint.PersonPosition.X,
+                    passengerToPaint.PersonPosition.Y + 15, 35, 75);
             }
         }
 

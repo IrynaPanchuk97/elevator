@@ -1,20 +1,29 @@
 ﻿using System;
+using System.Timers;
 using LiftSimulator.AbstractServices;
-using LiftSimulator.Mediators;
 using LiftSimulator.Models;
 
 namespace LiftSimulator.ConcreteServices
 {
-    public class PersonGenerator : BuildingColleague, IPersonGenerator
+    public class PersonGenerator : IPersonGenerator
     {
         private readonly BuildingModel _building;
 
-        public PersonGenerator(BuildingModel building, BuildingMediator mediator) : base(mediator)
+        public PersonGenerator(BuildingModel building)
         {
             _building = building;
         }
 
-        public PersonModel AddPerson()
+        public void GeneratePerson()
+        {
+            var aTimer = new Timer(10000);
+
+            aTimer.Elapsed += AddPerson;
+            aTimer.Interval = 5000;
+            aTimer.Enabled = true;
+        }
+
+        private void AddPerson(object source, ElapsedEventArgs e)
         {
             var random = new Random();
             var startFloorIndex = random.Next(0, 4);
@@ -25,7 +34,7 @@ namespace LiftSimulator.ConcreteServices
                 endFloorIndex = random.Next(0, 4);
             }
 
-            return new PersonModel(_building, startFloorIndex, endFloorIndex, new PersonMediator());
+            var personModel = new PersonModel(_building, startFloorIndex, endFloorIndex);
         }
     }
 }

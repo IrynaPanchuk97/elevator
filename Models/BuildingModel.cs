@@ -1,33 +1,38 @@
 ﻿using System.Collections.Generic;
+using LiftSimulator.ConcreteServices;
 using LiftSimulator.Mediators;
 
 namespace LiftSimulator.Models
 {
     public class BuildingModel : BuildingColleague
     {
-        public BuildingModel(BuildingMediator mediator) : base(mediator)
-        {
-            InitializeFloors(mediator);
-            InitializeElevators(mediator);
-            NeedUiChanges();
-        }
-
         public List<FloorModel> Floors { get; set; }
         public List<ElevatorModel> Elevators { get; set; }
 
-        private void InitializeFloors(BuildingMediator mediator)
+        public BuildingModel(BuildingMediator mediator) : base(mediator)
         {
+            InitializeFloors();
+            InitializeElevators();
+
+            var personGenerator = new PersonGenerator(this);
+            personGenerator.GeneratePerson();
+        }
+
+        private void InitializeFloors()
+        {
+            Floors = new List<FloorModel>();
             for (var i = 0; i < 4; ++i)
             {
-                Floors.Add(new FloorModel(i, this, new FloorMediator()));
+                Floors.Add(new FloorModel(i, this));
             }
         }
 
-        private void InitializeElevators(BuildingMediator mediator)
+        private void InitializeElevators()
         {
+            Elevators = new List<ElevatorModel>();
             for (var i = 0; i < 3; ++i)
             {
-                Elevators.Add(new ElevatorModel(this, Floors[0], new ElevatorMediator(i)));
+                Elevators.Add(new ElevatorModel(this, Floors[0]));
             }
         }
     }

@@ -1,9 +1,8 @@
 ﻿using System.Collections.Generic;
-using LiftSimulator.Mediators;
 
 namespace LiftSimulator.Models
 {
-    public class ElevatorModel : ElevatorColleague
+    public class ElevatorModel
     {
         public int LiftOrder { get; set; }
 
@@ -18,8 +17,7 @@ namespace LiftSimulator.Models
         private readonly List<Passenger> _listOfPeopleInside;
         private bool _isFull;
 
-        public ElevatorModel(BuildingModel building, FloorModel currentFloor, ElevatorMediator mediator) :
-            base(mediator)
+        public ElevatorModel(BuildingModel building, FloorModel currentFloor)
         {
             CurrentFloor = currentFloor;
             Building = building;

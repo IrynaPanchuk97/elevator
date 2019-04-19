@@ -5,7 +5,7 @@ namespace LiftSimulator.Mediators
 {
     public class PersonMediator
     {
-        public PersonViewModel PersonView { get; private set; }
+        //public PersonViewModel PersonView { get; private set; }
 
         public PersonMediator()
         {
@@ -14,21 +14,21 @@ namespace LiftSimulator.Mediators
 
         private void CreateComponents()
         {
-            PersonView = new PersonViewModel(this);
+            //PersonView = new PersonViewModel(this);
         }
 
         public void SomethingChangesOnUi(PersonColleague colleague)
         {
-            if (colleague is PersonModel person)
-            {
-                var personStatus = person.PersonStatus;
-                switch (personStatus)
-                {
-                    case PersonStatus.WaitingForAnElevator:
+            //if (colleague is PersonModel person)
+            //{
+            //    var personStatus = person.PersonStatus;
+            //    switch (personStatus)
+            //    {
+            //        case PersonStatus.WaitingForAnElevator:
 
-                        break;
-                }
-            }
+            //            break;
+            //    }
+            //}
         }
     }
 }

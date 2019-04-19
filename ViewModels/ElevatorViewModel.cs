@@ -1,20 +1,19 @@
 ﻿using System.Drawing;
-using LiftSimulator.Mediators;
 
 namespace LiftSimulator.ViewModels
 {
-    public class ElevatorViewModel : ElevatorColleague
+    public class ElevatorViewModel
     {
-        private Point _elevatorPosition;
         private readonly Bitmap[] _elevatorFrames;
         private int _currentFrameNumber;
         private readonly int _elevatorAnimationDelay;
         private readonly System.Timers.Timer _elevatorTimer;
 
-        public ElevatorViewModel(int elevatorXPosition, int elevatorYPosition, ElevatorMediator mediator) :
-            base(mediator)
+        public Point ElevatorPosition { get; set; }
+
+        public ElevatorViewModel(int elevatorXPosition, int elevatorYPosition)
         {
-            _elevatorPosition = new Point(elevatorXPosition, elevatorYPosition);
+            ElevatorPosition = new Point(elevatorXPosition, elevatorYPosition);
             _currentFrameNumber = 0;
             _elevatorFrames = new[]
             {

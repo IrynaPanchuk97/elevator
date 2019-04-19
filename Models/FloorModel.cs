@@ -1,20 +1,18 @@
 ﻿using LiftSimulator.Concrete;
-using LiftSimulator.Mediators;
 
 namespace LiftSimulator.Models
 {
-    public class FloorModel : FloorColleague
+    public class FloorModel
     {
         public int FloorNumber;
         public BuildingModel Building { get; set; }
         public FloorPersonsQuery FloorPersonsQuery { get; set; }
 
-        public FloorModel(int floorNumber, BuildingModel building, FloorMediator mediator) : base(mediator)
+        public FloorModel(int floorNumber, BuildingModel building)
         {
             FloorNumber = floorNumber;
             Building = building;
             FloorPersonsQuery = new FloorPersonsQuery();
         }
-
     }
 }

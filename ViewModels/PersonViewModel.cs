@@ -1,16 +1,15 @@
 ﻿using System;
 using System.Drawing;
 using System.Threading;
-using LiftSimulator.Mediators;
 
 namespace LiftSimulator.ViewModels
 {
-    public class PersonViewModel : PersonColleague
+    public class PersonViewModel
     {
         public Point PersonPosition;
         public Bitmap PersonGraphic { get; set; }
+        public bool Visible { get; set; }
 
-        private bool _visible;
         private readonly int _passengerAnimationDelay;
 
         static readonly Bitmap[] ArrayOfAllPersonGraphics =
@@ -24,11 +23,11 @@ namespace LiftSimulator.ViewModels
             new Bitmap(Properties.Resources.Seven)
         };
 
-        public PersonViewModel(PersonMediator mediator) : base(mediator)
+        public PersonViewModel()
         {
             PersonPosition = new Point();
+            Visible = true;
             var random = new Random();
-            _visible = true;
             _passengerAnimationDelay = 8;
             PersonGraphic = new Bitmap(ArrayOfAllPersonGraphics[random.Next(ArrayOfAllPersonGraphics.Length)]);
         }

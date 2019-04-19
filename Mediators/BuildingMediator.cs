@@ -19,6 +19,18 @@ namespace LiftSimulator.Mediators
             BuildingModel = new BuildingModel(this);
         }
 
+
+        public void AddPersonToListOfWhoNeedAnimation(BuildingColleague colleague)
+        {
+            if (colleague is BuildingModel building)
+            {
+                //int newPassengerVerticalPosition = this._beginOfTheQueue + (this._widthOfSlotForSinglePassenger * (int)firstFreeSlotInQueue);
+                //passengerToAddOrRemvove.PassengerPosition = new Point(newPassengerVerticalPosition, GetFloorLevelInPixels());
+
+                //if (building.)
+            }
+        }
+
         public void SomethingChangesOnUi(BuildingColleague colleague)
         {
             if (colleague is BuildingModel building)
