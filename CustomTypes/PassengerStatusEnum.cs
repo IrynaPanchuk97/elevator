@@ -1,6 +1,6 @@
 ﻿namespace LiftSimulator
 {
-    enum PassengerStatus
+    public enum PersonStatus
     {
         WaitingForAnElevator,
         GettingInToTheElevator,

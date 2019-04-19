@@ -3,11 +3,10 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Threading;
 using System.Timers;
-using LiftSimulator.Custom_classes;
 
 namespace LiftSimulator
 {
-     public class Elevator:Colleague
+     public class Elevator
      {
         #region FIELDS
 
@@ -35,8 +34,7 @@ namespace LiftSimulator
 
         #region METHODS
 
-        public Elevator(Building myBuilding, int horizontalPosition, Floor startingFloor, Mediator mediator)
-            : base(mediator)
+        public Elevator(Building myBuilding, int horizontalPosition, Floor startingFloor)
         {
             _myBuilding = myBuilding;
 

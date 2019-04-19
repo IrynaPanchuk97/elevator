@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace LiftSimulator.Abstracts
+namespace LiftSimulator.AbstractServices
 {
     public interface IAlgorithmChoiceElevator
     {

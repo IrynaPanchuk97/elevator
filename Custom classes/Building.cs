@@ -51,9 +51,9 @@ namespace LiftSimulator
             ArrayFloors[3] = new Floor(this, 3, 32);
 
             ArrayOfAllElevators = new Elevator[3];
-            ArrayOfAllElevators[0] = new Elevator(this, 124, ArrayFloors[0], ElevatorManager);
-            ArrayOfAllElevators[1] = new Elevator(this, 210, ArrayFloors[0], ElevatorManager);
-            ArrayOfAllElevators[2] = new Elevator(this, 295, ArrayFloors[0], ElevatorManager);
+            ArrayOfAllElevators[0] = new Elevator(this, 124, ArrayFloors[0]);
+            ArrayOfAllElevators[1] = new Elevator(this, 210, ArrayFloors[0]);
+            ArrayOfAllElevators[2] = new Elevator(this, 295, ArrayFloors[0]);
 
             ListOfAllPeopleWhoNeedAnimation = new List<Passenger>();
             ElevatorManager = new ElevatorManager(ArrayOfAllElevators, ArrayFloors);

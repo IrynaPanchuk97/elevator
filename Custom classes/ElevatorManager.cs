@@ -1,15 +1,14 @@
-﻿using LiftSimulator.Custom_classes;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Timers;
-using LiftSimulator.Abstracts;
-using LiftSimulator.Concrete;
+using LiftSimulator.AbstractServices;
+using LiftSimulator.ConcreteServices;
 using Timer = System.Timers.Timer;
 
 namespace LiftSimulator
 {
-    public class ElevatorManager : Mediator
+    public class ElevatorManager
     {
         private readonly object _locker = new object();
         private readonly Elevator[] _arrayElevator;

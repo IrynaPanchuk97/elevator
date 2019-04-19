@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
-using LiftSimulator.Abstracts;
+using LiftSimulator.AbstractServices;
 
-namespace LiftSimulator.Concrete
+namespace LiftSimulator.ConcreteServices
 {
     internal class AlgorithmChoiceElevator : IAlgorithmChoiceElevator
     {

@@ -27,7 +27,7 @@ namespace LiftSimulator
         private Floor currentFloor;
         private int currentFloorIndex;
         public Direction PassengerDirection;
-        private PassengerStatus passengerStatus;  
+        private PersonStatus _personStatus;  
 
         private Floor targetFloor;
         private int targetFloorIndex;
@@ -50,7 +50,7 @@ namespace LiftSimulator
 
             this.currentFloor = CurrentFloor;
             this.currentFloorIndex = CurrentFloor.FloorIndex;            
-            this.passengerStatus = PassengerStatus.WaitingForAnElevator;
+            this._personStatus = PersonStatus.WaitingForAnElevator;
 
             this.targetFloor = MyBuilding.ArrayFloors[TargetFloorIndex];
             this.targetFloorIndex = TargetFloorIndex;
@@ -84,7 +84,7 @@ namespace LiftSimulator
                     if (elevator.AddNewPassengerIfPossible(this, this.targetFloor))
                     {
                         //Update insideTheElevator
-                        this.passengerStatus = PassengerStatus.GettingInToTheElevator;
+                        this._personStatus = PersonStatus.GettingInToTheElevator;
 
                         ThreadPool.QueueUserWorkItem(delegate { GetInToTheElevator(elevator); });                        
                         return;
@@ -120,7 +120,7 @@ namespace LiftSimulator
             if (this.myElevator.GetCurrentFloor() == this.targetFloor)
             {
                 //Set appropriate flag
-                this.passengerStatus = PassengerStatus.LeavingTheBuilding;                
+                this._personStatus = PersonStatus.LeavingTheBuilding;                
 
                 //Get out of the elevator
                 ThreadPool.QueueUserWorkItem(delegate { GetOutOfTheElevator(this.myElevator); });
@@ -253,18 +253,18 @@ namespace LiftSimulator
                 Elevator ElevatorWhichRisedAnEvent = ((ElevatorEventArgs)e).ElevatorWhichRisedAnEvent;
 
                 //For passengers who are getting in to the elevator and may not be able to unsubscribe yet                
-                if (this.passengerStatus == PassengerStatus.GettingInToTheElevator)
+                if (this._personStatus == PersonStatus.GettingInToTheElevator)
                 {
                     return;
                 }
 
                 //For passengers, who await for an elevator
-                if (this.passengerStatus == PassengerStatus.WaitingForAnElevator)
+                if (this._personStatus == PersonStatus.WaitingForAnElevator)
                 {
                     if ((ElevatorsDirectionIsNoneOrOk(ElevatorWhichRisedAnEvent) && (ElevatorWhichRisedAnEvent.AddNewPassengerIfPossible(this, targetFloor))))
                     {
-                        //Set passengerStatus
-                        passengerStatus = PassengerStatus.GettingInToTheElevator;
+                        //Set _personStatus
+                        _personStatus = PersonStatus.GettingInToTheElevator;
                         
                         //Get in to the elevator
                         ThreadPool.QueueUserWorkItem(delegate { GetInToTheElevator(ElevatorWhichRisedAnEvent); });

@@ -54,6 +54,8 @@ namespace LiftSimulator
             LampDown = false;
         }
 
+        //вставити людину де вільне місце в черзі
+
         private int? FindFirstFreeSlotInQueue()
         {
             //Lock not needed. Only one reference, already locked.
@@ -118,27 +120,6 @@ namespace LiftSimulator
             }
         }
 
-        public int GetMaximumAmmountOfPeopleInTheQueue()
-        {
-            return _maximumAmmountOfPeopleInTheQueue;
-        }
-
-        public int GetCurrentAmmountOfPeopleInTheQueue()
-        {
-            lock (_locker) //The same lock is on add/remove passenger to the queue
-            {
-                int CurrentAmmountOfPeopleInTheQueue = 0;
-                for (int i = 0; i < _maximumAmmountOfPeopleInTheQueue; i++)
-                {
-                    if (this._arrayOfPeopleWaitingForElevator[i] != null)
-                    {
-                        CurrentAmmountOfPeopleInTheQueue++;
-                    }
-                }
-                return CurrentAmmountOfPeopleInTheQueue;
-            }
-        }
-
         public Passenger[] GetArrayOfPeopleWaitingForElevator()
         {
             return _arrayOfPeopleWaitingForElevator;
@@ -166,21 +147,13 @@ namespace LiftSimulator
         public event EventHandler NewPassengerAppeared;
         public void OnNewPassengerAppeared(EventArgs e)
         {
-            EventHandler newPassengerAppeared = NewPassengerAppeared;
-            if (newPassengerAppeared != null)
-            {
-                newPassengerAppeared(this, e);
-            }
+            NewPassengerAppeared?.Invoke(this, e);
         }
 
         public event EventHandler ElevatorHasArrivedOrIsNotFullAnymore;
         public void OnElevatorHasArrivedOrIsNoteFullAnymore(ElevatorEventArgs e)
         {
-            EventHandler elevatorHasArrivedOrIsNoteFullAnymore = ElevatorHasArrivedOrIsNotFullAnymore;
-            if (elevatorHasArrivedOrIsNoteFullAnymore != null)
-            {
-                elevatorHasArrivedOrIsNoteFullAnymore(this, e);
-            }
+            ElevatorHasArrivedOrIsNotFullAnymore?.Invoke(this, e);
         }
 
         #endregion

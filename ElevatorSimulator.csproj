@@ -46,14 +46,23 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Abstracts\IPersonGenerator.cs" />
     <Compile Include="Concrete\AlgorithmChoiceElevator.cs" />
+    <Compile Include="Concrete\FloorPersonsQuery.cs" />
+    <Compile Include="Mediators\PersonColleague.cs" />
+    <Compile Include="Mediators\FloorColleague.cs" />
+    <Compile Include="Mediators\ElevatorColleague.cs" />
+    <Compile Include="Mediators\BuildingColleague.cs" />
+    <Compile Include="Mediators\ElevatorMediator.cs" />
+    <Compile Include="Mediators\PersonMediator.cs" />
+    <Compile Include="Mediators\FloorMediator.cs" />
+    <Compile Include="Mediators\BuildingMediator.cs" />
+    <Compile Include="Concrete\PersonGenerator.cs" />
     <Compile Include="Custom classes\Building.cs" />
     <Compile Include="CustomTypes\DirectionEnum.cs" />
     <Compile Include="CustomTypes\ElevatorEventArgs.cs" />
     <Compile Include="CustomTypes\ElevatorStatusEnum.cs" />
     <Compile Include="Custom classes\Elevator.cs" />
-    <Compile Include="Custom classes\Colleague.cs" />
-    <Compile Include="Custom classes\Mediator.cs" />
     <Compile Include="Custom classes\ElevatorManager.cs" />
     <Compile Include="Custom classes\Floor.cs" />
     <Compile Include="CustomTypes\PassengerEventArgs.cs" />
@@ -66,8 +75,16 @@
     </Compile>
     <Compile Include="Custom classes\Passenger.cs" />
     <Compile Include="Abstracts\IAlgorithmChoiceElevator.cs" />
+    <Compile Include="Models\BuildingModel.cs" />
+    <Compile Include="Models\ElevatorModel.cs" />
+    <Compile Include="Models\FloorModel.cs" />
+    <Compile Include="Models\PersonModel.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ViewModels\BuildingViewModel.cs" />
+    <Compile Include="ViewModels\ElevatorViewModel.cs" />
+    <Compile Include="ViewModels\FloorViewModel.cs" />
+    <Compile Include="ViewModels\PersonViewModel.cs" />
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
     </EmbeddedResource>
